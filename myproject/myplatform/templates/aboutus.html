@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="section-title">Подробнее обо мне и проекте</h2>
+                <p class="text-muted">Преданная своему делу студентка Московского Педагогического Гуманитарного Университета</p>
+            </div>
+        </div>
+    
+        <div class="team-member p-4 shadow-sm" style="background: #ffffff; border-radius: 50px; border: 1px solid #eee;">
+        <div class="d-flex align-items-start align-items-lg-center flex-column flex-md-row"> 
+            <div class="flex-shrink-0 mb-3 mb-md-0">
+                <img src="/media/image/aboutus/aboutus_img.jpg" 
+                    alt="Анастасия" 
+                    style="width: 400px; height: 400px; object-fit: cover; border-radius: 25px;"
+                    class="shadow-sm">
+            </div>
+
+            <div class="flex-grow-1 ms-0 ms-md-5"> 
+                <h3 class="fw-bold mb-1" style="color: #2c3e50;">Анастасия Андреевна</h3>
+                <p class="text-primary fw-medium mb-4">Студентка 4 курса</p>
+                
+                <div style="line-height: 1.7; color: #555;">
+                    <p class="mb-3">
+                        Платформа, на которой вы находитесь, создана с целью помочь новым поступающим и студентам нашего университета спокойно и быстро находить мероприятия и сообщества на любой вкус и цвет. 
+                    </p>
+                    <p class="mb-0">
+                        А также у каждого будет свой <strong>личный профиль</strong>, в котором можно будет видеть ваши достижения, подписки и приглашения.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+{% endblock content%}

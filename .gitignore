@@ -1,0 +1,4 @@
+_pycache_
+.myvenv
+db.sqlite3
+text

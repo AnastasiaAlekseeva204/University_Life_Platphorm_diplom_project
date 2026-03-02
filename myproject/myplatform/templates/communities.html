@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Сообщества{% endblock title%}
+{% block content %}
+    <div class="container">
+        {% if all_communities %}
+            <div class="row"> 
+            {% for communitie in all_communities %}
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    {% if communitie.img %}
+                        <img src="{{communitie.img.url}}" class="card-img-top" alt="{{ communitie.name }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <img src="/media/communities_img.jpg" class="card-img-top" alt="{{ communitie.name }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{communitie.name}}
+                        </h5>
+                        <p class="card-text">
+                            {{communitie.description|truncatechars:150}}
+                        </p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-map-market-alt"></i>
+                                Организатор: 
+                            </small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Создано: {{ communitie.created_at|date:"d.m.Y" }}
+                            </small>
+                            <a href="{% url 'community_detail' community_id=communitie.id %}" class="btn btn-primary">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-md-12">
+                <p class="lead">
+                    Скоро здесь появятся сообщества!
+                </p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+{% endblock content %}

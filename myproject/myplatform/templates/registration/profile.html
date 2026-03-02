@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Профиль{% endblock title %}
+{% block content %}
+<div class="bg-light">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="text-center">
+                    <div class="position-relative d-inline-block">
+                        <img src="/media/image/profile/DSCN2781.JPG" class="rounded-circle profile-pic" alt="Profile Picture">
+                        <button class="btn btn-primary btn-sm position-absolute bottom-0 end-0 rounded-circle shadow">
+                            <i class="fas fa-camera"></i>
+                        </button>
+                    </div>
+                    <h3 class="mt-3 mb-1">{{ user.name }}</h3>
+                    <p class="text-muted mb-3">{{ user.role}}</p>
+                </div>
+            </div>
+
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="row g-0">
+                            <div class="col-lg-3 border-end">
+                                <div class="p-4">
+                                    <div class="nav flex-column nav-pills">
+                                        <a class="nav-link active" href="#"><i class="fas fa-user me-2"></i>Персональная ифнормация</a>
+                                        <a class="nav-link" href="#"><i class="fas fa-chart-line me-2"></i>Активность студента</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-9">
+                                <div class="p-4">
+                                    <div class="mb-4">
+                                        <h5 class="mb-4 fw-bold">Персональная информация</h5>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label small text-muted">Имя</label>
+                                                <input type="text" class="form-control" value="{{ user.first_name|default:'Анастасия' }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small text-muted">Фамилия</label>
+                                                <input type="text" class="form-control" value="{{ user.last_name|default:'Алексеева' }}">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label small text-muted">Почта</label>
+                                                <input type="email" class="form-control" value="{{ user.email|default:'alex@example.com' }}">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="form-label small text-muted">обо мне</label>
+                                                <textarea class="form-control" rows="3">Опытный разработчик, создаю крутые проекты на Django.</textarea>
+                                            </div>
+                                            <div class="col-12 text-end mt-4">
+                                                <button class="btn btn-primary px-4">Сохранить</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="my-4">
+                                    <div>
+                                        <h6 class="mb-3 fw-bold">Recent Activity</h6>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="bg-light p-2 rounded-circle me-3"><i class="fas fa-image text-primary"></i></div>
+                                            <div>
+                                                <p class="mb-0 small fw-bold">Updated profile picture</p>
+                                                <p class="text-muted mb-0" style="font-size: 0.75rem;">2 hours ago</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
