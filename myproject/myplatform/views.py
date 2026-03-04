@@ -4,6 +4,7 @@ from .models import Event
 from .models import Community
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate, login as auth_login
 
 
 def index(request):
@@ -34,6 +35,22 @@ def register(request):
     return render(request,'registration/register.html')
 
 def login(request):
+    if request.user.is_authenticated:
+        return redirect("profile")
+    if request.method=='POST':
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+        remember = request.POST.get("remember")
+        user = authenticate(request,username = username, password = password)
+        if user is not None:
+            auth_login(request,user)
+            if not remember:
+                request.session.set_expiry(0)
+                messages.success(request,f'Добро пожаловать,{user.username}!')
+                return redirect("profile")
+            else:
+                messages.error(request,'Неверный username или пароль')
+                return redirect("login")
     return render(request,'registration/login.html')
 
 def profile(request):
