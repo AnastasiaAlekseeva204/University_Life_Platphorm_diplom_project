@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404,redirect
 from django.http import HttpResponse
 from .models import Event
 from .models import Community
+from .models import Faculty
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login
@@ -65,6 +66,11 @@ def profile(request):
         user.email = request.POST.get('email', '')
         user.about_text = request.POST.get('about_text', '')
         user.birth_date = request.POST.get('birth_date', '')
+        faculty_id = request.POST.get('faculty')
+        if faculty_id:
+            user.faculty_id = faculty_id
+        else:
+            user.faculty = None
         if request.FILES.get('img'):
             user.img = request.FILES['img']
         
@@ -72,7 +78,8 @@ def profile(request):
         messages.success(request, 'Профиль успешно обновлен')
         return redirect('profile')
     events = Event.objects.all()
-    return render(request,'registration/profile.html',{'events':events})
+    faculties = Faculty.objects.all()
+    return render(request,'registration/profile.html',{'events':events, 'faculties': faculties})
 
 #def logout(request):
 #    return render(request, 'registration/logout.html')
