@@ -33,43 +33,65 @@
 
                             <div class="col-lg-9">
                                 <div class="p-4">
-                                    <div class="mb-4">
-                                        <h5 class="mb-4 fw-bold">Персональная информация</h5>
-                                        <div class="row g-3">
-                                            <div class="col-md-6">
-                                                <label class="form-label small text-muted">Имя</label>
-                                                <input type="text" class="form-control" value="{{ user.name|default:'аноним' }}">
+                                    <form method="post" enctype="multipart/form-data">
+                                        {% csrf_token %}
+                                        <div class="mb-4">
+                                            <h5 class="mb-4 fw-bold">Персональная информация</h5>
+                                            {{user.events_joined.all}}
+                                            <div class="row g-3">
+                                                <div class="col-md-6">
+                                                    <label class="form-label small text-muted">Имя</label>
+                                                    <input type="text" name="name" class="form-control" value="{{ user.name|default:'аноним' }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small text-muted">Фамилия</label>
+                                                    <input type="text" name="last_name_student" class="form-control" value="{{ user.last_name_student|default:'аноним' }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small text-muted">Отчество</label>
+                                                    <input type="text" name="middle_name_student" class="form-control" value="{{ user.middle_name_student|default:'аноним' }}">
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label small text-muted">День рождение</label>
+                                                    <input type="date" 
+                                                        name="birth_date" 
+                                                        class="form-control {% if form.birth_date.errors %}is-invalid{% endif %}" 
+                                                        id="birth_date"
+                                                        value="{% if form.birth_date.value %}{{ form.birth_date.value|date:'Y-m-d' }}{% elif user.birth_date %}{{ user.birth_date|date:'Y-m-d' }}{% endif %}"
+                                                        lang="ru">
+                                                    {% if form.birth_date.errors %}
+                                                        <div class="invalid-feedback">
+                                                            {{ form.birth_date.errors }}
+                                                        </div>
+                                                    {% endif %}
+                                                    
+                                                    {% if not user.birth_date %}
+                                                        <small class="form-text text-muted">
+                                                            Дата не указана. Формат: ГГГГ-ММ-ДД
+                                                        </small>
+                                                    {% endif %}
+                                                </div>
+                                                {% comment %}
+                                                <div class="col-md-6">
+                                                    <label class="form-label small text-muted">Почта</label>
+                                                    <input type="email" name="email" class="form-control" value="{{ user.email|default:'аноним' }}">
+                                                </div>
+                                                {% endcomment %}
+                                                <div class="col-12">
+                                                    <label class="form-label small text-muted">Факультет</label>
+                                                    <textarea class="form-control" rows="3">{{user.faculty}}</textarea>
+                                                </div>
+                                                <div class="col-12">
+                                                    <label class="form-label small text-muted">обо мне</label>
+                                                    <textarea class="form-control" name="about_text" rows="3">{{user.about_text}}</textarea>
+                                                </div>
+                                                <div class="col-12 text-end mt-4">
+                                                    <button  type="submit" class="btn btn-primary px-4">Сохранить</button>
+                                                </div>
                                             </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label small text-muted">Фамилия</label>
-                                                <input type="text" class="form-control" value="{{ user.last_name_student|default:'аноним' }}">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label small text-muted">Отчество</label>
-                                                <input type="text" class="form-control" value="{{ user.middle_name_student|default:'аноним' }}">
-                                            </div>
-                                             <div class="col-md-6">
-                                                <label class="form-label small text-muted">День рождение</label>
-                                                <input type="text" class="form-control" value="{{ user.birth_date|default:'аноним' }}">
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label small text-muted">Почта</label>
-                                                <input type="email" class="form-control" value="{{ user.email|default:'аноним' }}">
-                                            </div>
-                                            <div class="col-12">
-                                                <label class="form-label small text-muted">Факультет</label>
-                                                <textarea class="form-control" rows="3">{{user.faculty}}</textarea>
-                                            </div>
-                                            <div class="col-12">
-                                                <label class="form-label small text-muted">обо мне</label>
-                                                <textarea class="form-control" rows="3">{{user.about_text}}</textarea>
-                                            </div>
-                                            <div class="col-12 text-end mt-4">
-                                                <button class="btn btn-primary px-4">Сохранить</button>
-                                            </div>
+                                        
                                         </div>
-                                    </div>
-
+                                    </form>
                                     <hr class="my-4">
                                     <div>
                                         <h6 class="mb-3 fw-bold">Recent Activity</h6>

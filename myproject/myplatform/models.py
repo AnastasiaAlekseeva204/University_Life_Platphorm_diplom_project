@@ -68,6 +68,12 @@ class Event(models.Model):
         verbose_name='Организатор',
         limit_choices_to={'role': User.Role.ORGANIZER}
     ) 
+    participants = models.ManyToManyField(
+        User,
+        related_name='events_joined',
+        blank=True,
+        verbose_name="Участники"
+    )
     max_participants = models.PositiveIntegerField(verbose_name="Максимальное количество участников")
     img = models.ImageField(verbose_name='Фото мероприятий',upload_to='image/events',blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)

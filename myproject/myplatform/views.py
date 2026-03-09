@@ -57,7 +57,22 @@ def profile(request):
     if not request.user.is_authenticated:
         messages.warning(request,'Пожалуйста войдите в систему, чтобы посмотреть профиль')
         return redirect("login")
-    return render(request,'registration/profile.html')
+    if request.method=='POST':
+        user = request.user
+        user.name = request.POST.get('name', '')
+        user.last_name_student = request.POST.get('last_name_student', '')
+        user.middle_name_student = request.POST.get('middle_name_student', '')
+        user.email = request.POST.get('email', '')
+        user.about_text = request.POST.get('about_text', '')
+        user.birth_date = request.POST.get('birth_date', '')
+        if request.FILES.get('img'):
+            user.img = request.FILES['img']
+        
+        user.save()
+        messages.success(request, 'Профиль успешно обновлен')
+        return redirect('profile')
+    events = Event.objects.all()
+    return render(request,'registration/profile.html',{'events':events})
 
 #def logout(request):
 #    return render(request, 'registration/logout.html')
