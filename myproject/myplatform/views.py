@@ -21,6 +21,16 @@ def event_detail(request,event_id):
     event_det = get_object_or_404(Event,pk = event_id)
     return render(request, 'event_detail.html', {'event_det': event_det})
 
+@login_required(login_url='login')
+def join_event(request,event_id):
+    event = get_object_or_404(Event,pk=event_id)
+    if event.participants.filter(id=request.user.id).exists():
+        messages.warning(request, "Вы уже записались на мероприятие")
+    else:
+        event.participants.add(request.user)
+        messages.success(request,"Вы записаны на мероприятие")
+    return render(request,'event_detail.html',{'event_det': event})
+
 def communities(request):
     all_communities = Community.objects.all().order_by('-created_at')
     return render(request, 'communities.html', {'all_communities':all_communities})
@@ -28,6 +38,15 @@ def communities(request):
 def community_detail(request,community_id):
     com_det = get_object_or_404(Community,pk = community_id)
     return render(request,'community_detail.html', {'com_det': com_det})
+
+def join_community(request,community_id):
+    community = get_object_or_404(Community,pk=community_id)
+    if community.participants.filter(id=request.user.id).exists():
+        messages.warning(request,"Вы участник")
+    else:
+        community.participants.add(request.user)
+        messages.success(request,"Вы присоединились")
+    return render(request,'community_detail.html',{'com_det':community})
 
 def aboutus(request):
     return render(request,'aboutus.html')

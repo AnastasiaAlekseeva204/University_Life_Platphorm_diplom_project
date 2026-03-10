@@ -49,6 +49,12 @@ class Community(models.Model):
         verbose_name='Организатор',
         limit_choices_to={'role': User.Role.ORGANIZER}
     )
+    participants = models.ManyToManyField(
+        User,
+        related_name='communities_joined',
+        blank=True,
+        verbose_name="Участники"
+    )
     img = models.ImageField(verbose_name='Фото сообщества',upload_to='image/communities',blank=True,null=True)
     status = models.CharField(max_length=50,choices=Status.choices,default=Status.ISNOTACTIVE,verbose_name='Статус')
     created_at = models.DateTimeField(auto_now_add=True)

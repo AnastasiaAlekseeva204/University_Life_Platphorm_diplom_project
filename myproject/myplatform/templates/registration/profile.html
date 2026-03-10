@@ -37,7 +37,6 @@
                                         {% csrf_token %}
                                         <div class="mb-4">
                                             <h5 class="mb-4 fw-bold">Персональная информация</h5>
-                                            {{user.events_joined.all}}
                                             <div class="row g-3">
                                                 <div class="col-md-6">
                                                     <label class="form-label small text-muted">Имя</label>
@@ -99,6 +98,56 @@
                                         
                                         </div>
                                     </form>
+                                </div>
+                                <div class="p-4">
+                                    <div class="mb-4">
+                                        <h5 class="mb-4 fw-bold">Запись на мероприятия</h5>
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Название</th>
+                                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for event in user.events_joined.all %}
+                                                    <tr>
+                                                        <td>
+                                                            {{forloop.counter}}
+                                                        </td>
+                                                        <td>
+                                                            {{event.name}}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="p-4">
+                                    <div class="mb-4">
+                                        <h5 class="mb-4 fw-bold">Запись в сообщества</h5>
+                                        <table class="table table-striped table-hover">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Название</th>
+                                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for community in user.communities_joined.all %}
+                                                    <tr>
+                                                        <td>
+                                                            {{forloop.counter}}
+                                                        </td>
+                                                        <td>
+                                                            {{community.name}}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
