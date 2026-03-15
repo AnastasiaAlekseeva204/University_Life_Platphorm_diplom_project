@@ -9,7 +9,7 @@
                         {{com_det.name}}
                     </h1>
                     <form method="post" action="{% url 'join_community' com_det.id %}">
-                    {% csrf_token %}
+                        {% csrf_token %}
                         <button class="btn btn-outline-info btn-lg ">
                             <i class="bi bi-heart"></i>Присоединится</button>
                     </form>

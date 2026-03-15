@@ -31,6 +31,14 @@ def join_event(request,event_id):
         messages.success(request,"Вы записаны на мероприятие")
     return render(request,'event_detail.html',{'event_det': event})
 
+
+def delete_event(request,event_id):
+    delete_event = get_object_or_404(Event,pk=event_id)
+    if delete_event.participants.filter(id=request.user.id).exists():
+        delete_event.participants.remove(request.user)
+        messages.success(request,"Отписались")
+    return render(request,"registration/profile.html")
+
 def communities(request):
     all_communities = Community.objects.all().order_by('-created_at')
     return render(request, 'communities.html', {'all_communities':all_communities})
@@ -47,6 +55,13 @@ def join_community(request,community_id):
         community.participants.add(request.user)
         messages.success(request,"Вы присоединились")
     return render(request,'community_detail.html',{'com_det':community})
+
+def delete_community(request,community_id):
+    delete_community = get_object_or_404(Community,pk=community_id)
+    if delete_community.participants.filter(id=request.user.id).exists():
+        delete_community.participants.remove(request.user)
+        messages.success(request,"Вы вышли из сообщества")
+    return render(request,'registration/profile.html')
 
 def aboutus(request):
     return render(request,'aboutus.html')

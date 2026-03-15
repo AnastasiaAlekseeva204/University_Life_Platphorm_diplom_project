@@ -18,4 +18,6 @@ urlpatterns = [
     path('logout', auth_views.LogoutView.as_view(template_name='registration/logout.html',next_page='index'),  name='logout'),
     path('event/<int:event_id>/join/',views.join_event, name='join_event'),
     path('community/<int:community_id>/join/',views.join_community, name='join_community'),
+    path('community/<int:community_id>/delete/',views.delete_community,name='delete_community'),
+    path('event/<int:event_id>/delete/',views.delete_event,name='delete_event'),
 ]
