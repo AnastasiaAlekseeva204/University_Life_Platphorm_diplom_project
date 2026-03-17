@@ -20,4 +20,6 @@ urlpatterns = [
     path('community/<int:community_id>/join/',views.join_community, name='join_community'),
     path('community/<int:community_id>/delete/',views.delete_community,name='delete_community'),
     path('event/<int:event_id>/delete/',views.delete_event,name='delete_event'),
+    path('forgotpassword',views.forgotpassword,name='forgotpassword'),
+    path('resetpassword/<str:username>/',views.resetpassword,name='resetpassword'),
 ]

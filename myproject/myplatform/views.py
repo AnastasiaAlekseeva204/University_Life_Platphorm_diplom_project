@@ -3,6 +3,7 @@ from django.http import HttpResponse
 from .models import Event
 from .models import Community
 from .models import Faculty
+from .models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login
@@ -36,7 +37,7 @@ def delete_event(request,event_id):
     delete_event = get_object_or_404(Event,pk=event_id)
     if delete_event.participants.filter(id=request.user.id).exists():
         delete_event.participants.remove(request.user)
-        messages.success(request,"Отписались")
+        messages.success(request,f'Вы отказались от участия в мероприятие "{delete_event.name}"')
     return render(request,"registration/profile.html")
 
 def communities(request):
@@ -60,7 +61,7 @@ def delete_community(request,community_id):
     delete_community = get_object_or_404(Community,pk=community_id)
     if delete_community.participants.filter(id=request.user.id).exists():
         delete_community.participants.remove(request.user)
-        messages.success(request,"Вы вышли из сообщества")
+        messages.success(request,f'Вы вышли из сообщества "{delete_community.name}"')
     return render(request,'registration/profile.html')
 
 def aboutus(request):
@@ -87,6 +88,21 @@ def login(request):
                 messages.error(request,'Неверный username или пароль')
                 return redirect("login")
     return render(request,'registration/login.html')
+
+def forgotpassword(request):
+    if request.method=='POST':
+        username=request.POST.get('username')
+        try:
+            user = User.objects.get(username=username)
+            return redirect("resetpassword", username=user.username)
+        except User.DoesNotExist:
+            messages.error(request,'Нет такого пользователя')
+            return redirect("forgotpassword")
+        
+    return render(request,"registration/forgotpassword.html")
+
+def resetpassword(request,username):
+    return render(request,"registration/resetpassword.html",{'username':username})
 
 def profile(request):
     if not request.user.is_authenticated:
