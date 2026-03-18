@@ -38,8 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ckeditor',
     'myplatform',
-
+    'events_parser',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'myplatform.User'
 
 LOGOUT_REDIRECT_URL = 'index'
+
+# CKEditor для поля content в админке (events_parser.ParsedEvent)
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+    },
+}

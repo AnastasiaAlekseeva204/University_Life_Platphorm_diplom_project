@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('myplatform.urls')),
+    path('anonsy/', include('events_parser.urls')),
 ]
 
 if settings.DEBUG:
