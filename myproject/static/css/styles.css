@@ -91,3 +91,14 @@
 .info-section {
     padding: 15px;
 }
+
+
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    filter: brightness(110%);
+}
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
