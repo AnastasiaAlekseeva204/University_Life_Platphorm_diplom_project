@@ -22,4 +22,5 @@ urlpatterns = [
     path('event/<int:event_id>/delete/',views.delete_event,name='delete_event'),
     path('forgotpassword',views.forgotpassword,name='forgotpassword'),
     path('resetpassword/<str:username>/',views.resetpassword,name='resetpassword'),
+    path('activeratingpoints',views.activeratingpoints,name='activeratingpoints'),
 ]

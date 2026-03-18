@@ -131,5 +131,8 @@ def profile(request):
     faculties = Faculty.objects.all()
     return render(request,'registration/profile.html',{'events':events, 'faculties': faculties})
 
+def activeratingpoints(request):
+    return render(request,'registration/activeratingpoints.html')
+
 #def logout(request):
 #    return render(request, 'registration/logout.html')

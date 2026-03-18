@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Активность студента{% endblock title %}
+
+{% block content %}
+<div class="bg-light min-vh-100">
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="p-4">
+                        <div class="nav flex-column nav-pills">
+                            <a class="nav-link" href="/profile"><i class="fas fa-user me-2"></i>Персональная информация</a>
+                            <a class="nav-link active" href="#"><i class="fas fa-chart-line me-2"></i>Активность студента</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4">Сводка активности: {{ user.name }}</h5>
+                        <div class="row text-center">
+                            <div class="col-md-6 border-end">
+                                <div class="p-2">
+                                    <h2 class="text-primary fw-bold">{{ user.events_joined.count }}</h2>
+                                    <p class="text-muted mb-0">Мероприятий посещено</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-2">
+                                    <h2 class="text-success fw-bold">{{ user.communities_joined.count }}</h2>
+                                    <p class="text-muted mb-0">Сообществ выбрано</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-calendar-check text-primary me-2"></i>Ваши мероприятия</h6>
+                        <div class="list-group list-group-flush">
+                            {% for event in user.events_joined.all %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <div>
+                                        <span class="fw-medium">{{ event.name }}</span>
+                                        <br>
+                                        <small class="text-muted">Запись подтверждена</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">+10 баллов</span>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">Вы пока не записались ни на одно мероприятие.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-users text-success me-2"></i>Ваши сообщества</h6>
+                        <div class="row g-3">
+                            {% for community in user.communities_joined.all %}
+                                <div class="col-md-6">
+                                    <div class="p-3 border rounded bg-white h-100">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-users-cog fa-2x text-light"></i>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <h6 class="mb-0">{{ community.name }}</h6>
+                                                <small class="text-muted">Активный участник</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% empty %}
+                                <div class="col-12">
+                                    <p class="text-muted">Вы еще не вступили в сообщества.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
