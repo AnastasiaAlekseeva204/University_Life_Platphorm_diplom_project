@@ -1,0 +1,129 @@
+from datetime import datetime
+
+def parse_date(date_str):
+    # Пример строки: "25 января 2026"
+    months = {
+        'января': 1, 'февраля': 2, 'марта': 3, 'апреля': 4,
+        'мая': 5, 'июня': 6, 'июля': 7, 'августа': 8,
+        'сентября': 9, 'октября': 10, 'ноября': 11, 'декабря': 12
+    }
+    parts = date_str.lower().split()
+    day = int(parts[0])
+    month = months.get(parts[1], 1)
+    year = int(parts[2])
+    return datetime(year, month, day, 10, 0)  # Ставим дефолтное время 10:00
+
+
+
+# основной код парсинга
+import requests
+from django.core.files.base import ContentFile
+from .models import Event, User
+
+def parse_and_save_events():
+    # 1. Берем дефолтного организатора (нужно создать такого пользователя заранее!)
+    organizer = User.objects.filter(role=User.Role.ORGANIZER).first()
+    if not organizer:
+        return "Ошибка: не найден организатор с ролью ORGANIZER"
+
+    url = 'https://mpgu.su/anonsyi/'
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # ... логика поиска элементов (как в прошлом сообщении) ...
+    
+    for item in items:
+        title = ... 
+        date_str = ...
+        img_url = ... # ссылка на картинку с сайта
+        
+        # 2. Создаем или обновляем
+        event, created = Event.objects.get_or_create(
+            name=title,
+            defaults={
+                'description': 'Описание с сайта...',
+                'date_time': parse_date(date_str),
+                'location': 'МПГУ',
+                'organizator': organizer,
+                'max_participants': 50 # Дефолтное значение
+            }
+        )
+
+        # 3. Скачиваем картинку, если она новая
+        if created and img_url:
+            img_response = requests.get(img_url)
+            if img_response.status_code == 200:
+                event.img.save(f'{event.id}.jpg', ContentFile(img_response.content), save=True)
+
+
+# Шаг 1: Установка зависимостей
+# pip install requests beautifulsoup4
+# Шаг 2: Скрипт парсера (management/commands/parse_mpgu.py)
+import requests
+from bs4 import BeautifulSoup
+from datetime import datetime
+from django.core.management.base import BaseCommand
+from django.contrib.auth import get_user_model
+from your_app.models import Event  # Замени your_app на название своего приложения
+
+User = get_user_model()
+
+class Command(BaseCommand):
+    help = 'Парсит мероприятия с сайта МПГУ'
+
+    def handle(self, *args, **kwargs):
+        # 1. Находим или создаем системного пользователя-организатора
+        # Так как в модели поле organizator обязательно
+        admin_user, _ = User.objects.get_or_create(
+            username='mpgu_bot', 
+            defaults={'role': User.Role.ORGANIZER, 'email': 'bot@mpgu.edu'}
+        )
+
+        url = "https://mpgu.su/anonsyi/"
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        
+        self.stdout.write("Подключаюсь к МПГУ...")
+        response = requests.get(url, headers=headers)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Ищем карточки мероприятий
+        # На МПГУ это обычно блоки с классом 'listing-item'
+        items = soup.find_all('div', class_='listing-item')
+
+        count = 0
+        for item in items:
+            try:
+                name = item.find('a', class_='listing-item-title').text.strip()
+                link = item.find('a', class_='listing-item-title')['href']
+                
+                # Проверяем, нет ли уже такого события (чтобы не дублировать)
+                if Event.objects.filter(name=name).exists():
+                    continue
+
+                # Извлекаем дату (на сайте она обычно строкой "ДД.ММ.ГГГГ")
+                raw_date = item.find('div', class_='listing-item-date').text.strip()
+                # Конвертируем строку в объект datetime для твоего DateTimeField
+                # Если на сайте только дата, добавим время по умолчанию (например, 10:00)
+                clean_date = datetime.strptime(raw_date, '%d.%m.%Y')
+                
+                # Переходим внутрь статьи за описанием (опционально)
+                inner_resp = requests.get(link, headers=headers)
+                inner_soup = BeautifulSoup(inner_resp.text, 'html.parser')
+                description = inner_soup.find('div', class_='entry-content').text.strip()[:500] # Берем первые 500 символов
+
+                # Создаем объект в базе
+                Event.objects.create(
+                    name=name,
+                    description=description or "Описание на сайте",
+                    date_time=clean_date,
+                    location="МПГУ (см. на сайте)",
+                    organizator=admin_user,
+                    max_participants=50 # Заглушка, так как на сайте этого обычно нет
+                )
+                count += 1
+                self.stdout.write(f"Добавлено: {name}")
+
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Ошибка при парсинге элемента: {e}"))
+
+        self.stdout.write(self.style.SUCCESS(f"Готово! Добавлено мероприятий: {count}"))

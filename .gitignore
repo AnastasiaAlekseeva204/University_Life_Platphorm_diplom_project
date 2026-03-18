@@ -1,5 +1,7 @@
 _pycache_
 .myvenv
+venv/
+venv
 db.sqlite3
 text
 parser_example.txt
