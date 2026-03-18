@@ -4,6 +4,7 @@ from .models import Event
 from .models import Community
 from .models import Faculty
 from .models import User
+from events_parser.models import ParsedEvent
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login
@@ -16,7 +17,8 @@ def index(request):
 
 def events(request):
     all_events = Event.objects.all().order_by('-date_time')
-    return render(request,'events.html',{'all_events':all_events})
+    parsed_events = ParsedEvent.objects.all().order_by('-date_at')
+    return render(request,'events.html',{'all_events':all_events, 'parsed_events':parsed_events})
 
 def event_detail(request,event_id):
     event_det = get_object_or_404(Event,pk = event_id)

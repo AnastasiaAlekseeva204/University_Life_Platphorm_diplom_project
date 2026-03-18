@@ -1,138 +1,61 @@
-{% extends "base.html" %}
-{% load static %}
-{% block title %}{{ event.title }}{% endblock title %}
+{% extends 'base.html' %}
+{% block title %}Подробнее о мероприятие{% endblock title %}
 {% block content %}
-<style>
-  .parsed-detail {
-    --accent: #c45c26;
-    --accent-light: #e8a87c;
-    --deep: #0d2137;
-    --soft: #f5f0e8;
-    --ink: #1a1a1a;
-    --muted: #5c6b7a;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    padding-bottom: 4rem;
-  }
-  .parsed-detail .detail-hero {
-    background: linear-gradient(135deg, var(--deep) 0%, #1a3554 100%);
-    color: #fff;
-    padding: 2.5rem 1.5rem 3rem;
-    margin: 0 -12px 2rem;
-    border-radius: 0 0 24px 24px;
-    box-shadow: 0 10px 40px rgba(13, 33, 55, 0.2);
-  }
-  .parsed-detail .detail-hero-title {
-    font-size: clamp(1.35rem, 3vw, 1.85rem);
-    font-weight: 700;
-    line-height: 1.3;
-    margin-bottom: 0.75rem;
-    max-width: 900px;
-  }
-  .parsed-detail .detail-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    font-size: 0.95rem;
-    opacity: 0.95;
-  }
-  .parsed-detail .detail-meta span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-  }
-  .parsed-detail .detail-body {
-    max-width: 780px;
-    margin: 0 auto;
-  }
-  .parsed-detail .detail-body .content-block {
-    background: #fff;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 4px 24px rgba(13, 33, 55, 0.06);
-    border: 1px solid rgba(13, 33, 55, 0.06);
-    line-height: 1.7;
-    color: var(--ink);
-  }
-  .parsed-detail .detail-body .content-block h2 { font-size: 1.25rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--deep); }
-  .parsed-detail .detail-body .content-block h3 { font-size: 1.1rem; margin-top: 1.25rem; margin-bottom: 0.4rem; color: var(--deep); }
-  .parsed-detail .detail-body .content-block p { margin-bottom: 1rem; }
-  .parsed-detail .detail-body .content-block ul, .parsed-detail .detail-body .content-block ol { margin-bottom: 1rem; padding-left: 1.5rem; }
-  .parsed-detail .detail-body .content-block a { color: var(--accent); font-weight: 500; }
-  .parsed-detail .detail-body .content-block a:hover { text-decoration: underline; }
-  .parsed-detail .detail-actions {
-    margin-top: 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  .parsed-detail .btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    background: var(--deep);
-    color: #fff;
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: background 0.2s;
-  }
-  .parsed-detail .btn-back:hover { background: #1a3554; color: #fff; }
-  .parsed-detail .btn-source {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    border-radius: 10px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.95rem;
-    transition: background 0.2s, color 0.2s;
-  }
-  .parsed-detail .btn-source:hover { background: rgba(196, 92, 38, 0.1); color: var(--accent); }
-</style>
-<div class="parsed-detail">
-  <div class="container">
-    <div class="detail-hero">
-      <div class="detail-hero-title">{{ event.title }}</div>
-      <div class="detail-meta">
-        {% if event.date_at %}
-        <span>📅 {{ event.date_at|date:"d.m.Y" }}{% if event.date_at|date:"H:i" != "00:00" %} {{ event.date_at|date:"H:i" }}{% endif %}</span>
-        {% endif %}
-        {% if event.source_url %}
-        <span>🔗 МПГУ</span>
-        {% endif %}
-      </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{message}}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                {% if event.image_url %}
+                    <img src="{{ event.image_url }}" class="img-fluid rounded mb-3 product-image" alt="{{event.title}}">
+                {% else %}
+                    <img src="/media/image/no_image.jpg" class="img-fluid rounded mb-3 product-image" alt="{{event.title}}">
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <h2 class="mb-3">{{event.title}}</h2>
+                <p class="text-muted mb-4">МПГУ</p>
+                <div class="mb-3">
+                    <span class="h4 me-2">
+                        {% if event.date_at %}
+                            {{ event.date_at|date:"d E Y, H:i" }}
+                        {% else %}
+                            Дата уточняется
+                        {% endif %}
+                    </span>
+                </div>
+                {% if event.excerpt %}
+                    <p class="mb-4">{{event.excerpt}}</p>
+                {% elif event.content_plain %}
+                    <p class="mb-4">{{event.content_plain|truncatechars:500}}</p>
+                {% endif %}
+                
+                {% if event.content %}
+                    <div class="mb-4">
+                        {{ event.content|safe }}
+                    </div>
+                {% endif %}
+                
+                <form method="post" action="{% url 'join_parsed_event' event.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-outline-info btn-lg mb-3 me-2">
+                        <i class="bi bi-heart"></i> Записаться
+                    </button>
+                </form>
+                
+                {% if event.source_url %}
+                <a href="{{ event.source_url }}" target="_blank" class="btn btn-outline-secondary btn-lg mb-3">
+                    Открыть на сайте МПГУ
+                </a>
+                {% endif %}
+            </div>
+        </div>
     </div>
-    <div class="detail-body">
-      {% if event.content %}
-      <div class="content-block">
-        {{ event.content|safe }}
-      </div>
-      {% elif event.content_plain %}
-      <div class="content-block">
-        <p style="white-space: pre-wrap;">{{ event.content_plain }}</p>
-      </div>
-      {% elif event.excerpt %}
-      <div class="content-block">
-        <p>{{ event.excerpt }}</p>
-      </div>
-      {% else %}
-      <div class="content-block">
-        <p class="text-muted">Текст мероприятия пока не загружен.</p>
-      </div>
-      {% endif %}
-      <div class="detail-actions">
-        <a href="{% url 'parsed_event_list' %}" class="btn-back">← К списку анонсов</a>
-        {% if event.source_url %}
-        <a href="{{ event.source_url }}" target="_blank" rel="noopener" class="btn-source">Открыть на сайте МПГУ →</a>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
 {% endblock content %}

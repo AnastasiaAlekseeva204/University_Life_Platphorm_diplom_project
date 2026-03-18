@@ -36,6 +36,7 @@ class Command(BaseCommand):
                     "excerpt": ev.get("excerpt", ""),
                     "content": ev.get("content_html", ""),
                     "content_plain": ev.get("content_text", ""),
+                    "image_url": ev.get("image_url", ""),
                 },
             )
             if was_created:

@@ -2,15 +2,60 @@
 {% block title %}Мероприятия{% endblock title %}
 {% block content %}
     <div class="container">
-        {% if all_events %}
+        {% if all_events or parsed_events %}
         <div class="row"> 
+            <!-- Анонсы МПГУ -->
+            {% for event in parsed_events %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if event.image_url %}
+                        <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                        <img src="/media/image/no_image.jpg" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{event.title}}
+                        </h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            {% if event.date_at %}
+                                {{event.date_at|date:"d.m.Y H:i"}}
+                            {% else %}
+                                Дата уточняется
+                            {% endif %}
+                        </h6>
+                        <p class="card-text">
+                            {% if event.excerpt %}
+                                {{event.excerpt|truncatechars:150}}
+                            {% elif event.content_plain %}
+                                {{event.content_plain|truncatechars:150}}
+                            {% endif %}
+                        </p>
+                        <div class="mb-2">
+                            <small class="text-muted">
+                                <i class="fas fa-map-marker-alt"></i>
+                                МПГУ
+                            </small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                Создано: {{ event.created_at|date:"d.m.Y" }}
+                            </small>
+                            <a href="{% url 'parsed_event_detail' event.pk %}" class="btn btn-primary">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Обычные мероприятия -->
             {% for event in all_events %}
             <div class="col-md-4 mb-4">
                 <div class="card h-100">
                     {% if event.img %}
                         <img src="{{event.img.url }}" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;">
                     {% else %}
-                        <img src="/media/events_img.jpg" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;">
+                        <img src="/media/image/no_image.jpg" class="card-img-top" alt="{{ event.name }}" style="height: 200px; object-fit: cover;">
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">
@@ -20,24 +65,18 @@
                             {{event.date_time|date:"d.m.Y H:i"}}
                         </h6>
                         <p class="card-text">
-                            {{event.descriotion|truncatechars:150}}
+                            {{event.description|truncatechars:150}}
                         </p>
                         <div class="mb-2">
                             <small class="text-muted">
-                                <i class="fas fa-map-market-alt"></i>
+                                <i class="fas fa-map-marker-alt"></i>
                                 {{event.location}}
                             </small>
                         </div>
                         <div class="mb-2">
                             <small class="text-muted">
-                                <i class="fas fa-map-market-alt"></i>
+                                <i class="fas fa-users"></i>
                                 Макс. участников: {{ event.max_participants }}
-                            </small>
-                        </div>
-                        <div class="mb-2">
-                            <small class="text-muted">
-                                <i class="fas fa-map-market-alt"></i>
-                                Организатор: 
                             </small>
                         </div>
                         <div class="d-flex justify-content-between align-items-center">

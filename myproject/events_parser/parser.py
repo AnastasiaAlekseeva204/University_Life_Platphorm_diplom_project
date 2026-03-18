@@ -17,15 +17,45 @@ def fetch_event_detail(page_url: str, text_max_length: int = 50000):
     Загружает страницу события и извлекает:
     - текст из qwen-markdown-text (excerpt);
     - основной контент (текст);
-    - div.content с вложенными секциями в формате HTML.
-    Возвращает кортеж (qwen_text, content_text, content_html).
+    - div.content с вложенными секциями в формате HTML;
+    - URL изображения.
+    Возвращает кортеж (qwen_text, content_text, content_html, image_url).
     """
     try:
         resp = requests.get(page_url, headers=HEADERS, timeout=15)
         resp.raise_for_status()
     except requests.RequestException:
-        return "", "", ""
+        return "", "", "", ""
     soup = BeautifulSoup(resp.text, "html.parser")
+
+    # Извлечение изображения
+    image_url = ""
+    # Ищем изображение в различных местах
+    img_selectors = [
+        "img.listing-item-image",
+        "img[class*='event']",
+        "img[class*='anons']",
+        ".rsContent img",
+        "article img",
+        ".content img",
+        "img[src*='upload']",
+        "img[src*='image']"
+    ]
+    for selector in img_selectors:
+        img = soup.select_one(selector)
+        if img and img.get("src"):
+            src = img.get("src")
+            if src and not src.endswith(".svg") and "logo" not in src.lower():
+                image_url = urljoin(page_url, src)
+                break
+    
+    # Если не нашли, берем первое подходящее изображение
+    if not image_url:
+        for img in soup.find_all("img"):
+            src = img.get("src", "")
+            if src and not src.endswith(".svg") and "logo" not in src.lower() and "icon" not in src.lower():
+                image_url = urljoin(page_url, src)
+                break
 
     qwen_el = soup.select_one("[class*='qwen-markdown-text'], [class*='qwen_markdown_text']")
     if not qwen_el:
@@ -70,7 +100,7 @@ def fetch_event_detail(page_url: str, text_max_length: int = 50000):
         if rs:
             content_html = "".join(str(c) for c in rs.contents).strip()
 
-    return qwen_text, content_text, content_html
+    return qwen_text, content_text, content_html, image_url
 
 
 def parse_date_dot(raw_date: str) -> datetime | None:
@@ -91,8 +121,8 @@ def parse_date_dot(raw_date: str) -> datetime | None:
 def fetch_listing(fetch_details: bool = True):
     """
     Загружает страницу анонсов и возвращает список словарей:
-    [{"name", "link", "date_str", "excerpt", "content_text", "content_html"}, ...]
-    Если fetch_details=True, для каждой карточки подгружается страница события (excerpt, content_*).
+    [{"name", "link", "date_str", "excerpt", "content_text", "content_html", "image_url"}, ...]
+    Если fetch_details=True, для каждой карточки подгружается страница события (excerpt, content_*, image_url).
     """
     try:
         response = requests.get(URL, headers=HEADERS, timeout=15)
@@ -117,12 +147,13 @@ def fetch_listing(fetch_details: bool = True):
                 raw_date = date_el.get_text(strip=True) if date_el else ""
                 ev = {"name": name, "link": link, "date_str": raw_date}
                 if fetch_details and link:
-                    qwen_text, content_text, content_html = fetch_event_detail(link)
+                    qwen_text, content_text, content_html, image_url = fetch_event_detail(link)
                     ev["excerpt"] = qwen_text
                     ev["content_text"] = content_text
                     ev["content_html"] = content_html
+                    ev["image_url"] = image_url
                 else:
-                    ev["excerpt"] = ev["content_text"] = ev["content_html"] = ""
+                    ev["excerpt"] = ev["content_text"] = ev["content_html"] = ev["image_url"] = ""
                 events.append(ev)
             except Exception:
                 continue
@@ -150,12 +181,13 @@ def fetch_listing(fetch_details: bool = True):
         seen.add(title)
         ev = {"name": title, "link": link, "date_str": date_str}
         if fetch_details and link:
-            qwen_text, content_text, content_html = fetch_event_detail(link)
+            qwen_text, content_text, content_html, image_url = fetch_event_detail(link)
             ev["excerpt"] = qwen_text
             ev["content_text"] = content_text
             ev["content_html"] = content_html
+            ev["image_url"] = image_url
         else:
-            ev["excerpt"] = ev["content_text"] = ev["content_html"] = ""
+            ev["excerpt"] = ev["content_text"] = ev["content_html"] = ev["image_url"] = ""
         events.append(ev)
 
     return events, None

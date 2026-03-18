@@ -10,6 +10,7 @@ class ParsedEvent(models.Model):
     excerpt = models.TextField("Краткое описание (qwen-markdown)", blank=True)
     content = RichTextField("Текст (HTML)", blank=True)
     content_plain = models.TextField("Текст (plain)", blank=True)
+    image_url = models.URLField("URL изображения", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
