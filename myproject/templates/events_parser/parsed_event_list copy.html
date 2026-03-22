@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Анонсы МПГУ{% endblock title %}
+{% block content %}
+<style>
+  .parsed-page {
+    --accent: #c45c26;
+    --accent-light: #e8a87c;
+    --deep: #0d2137;
+    --soft: #f5f0e8;
+    --ink: #1a1a1a;
+    --muted: #5c6b7a;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(165deg, #faf8f5 0%, #eee9e0 100%);
+    min-height: 80vh;
+    padding: 2rem 0 4rem;
+  }
+  .parsed-page .page-head {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .parsed-page .page-head p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 1.05rem;
+  }
+  .parsed-events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .parsed-card {
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(13, 33, 55, 0.08);
+    border: 1px solid rgba(13, 33, 55, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: inherit;
+  }
+  .parsed-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(13, 33, 55, 0.12);
+  }
+  .parsed-card .card-date {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-light) 100%);
+    color: #fff;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+  }
+  .parsed-card .card-body {
+    padding: 1.25rem 1.25rem 1.5rem;
+    flex: 1;
+  }
+  .parsed-card .card-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--deep);
+    line-height: 1.35;
+    margin-bottom: 0.75rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .parsed-card .card-excerpt {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .parsed-card .card-footer {
+    padding: 0 1.25rem 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .parsed-card .btn-card {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+  }
+  .parsed-card .btn-primary-card {
+    background: var(--deep);
+    color: #fff;
+  }
+  .parsed-card .btn-primary-card:hover { background: #1a3554; color: #fff; }
+  .parsed-card .btn-outline-card {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .parsed-card .btn-outline-card:hover { background: rgba(196, 92, 38, 0.1); color: var(--accent); }
+  .parsed-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--muted);
+    font-size: 1.1rem;
+  }
+  .parsed-empty a { color: var(--accent); font-weight: 600; }
+</style>
+<div class="parsed-page">
+  <div class="container">
+    <div class="page-head">
+      <p>Мероприятия и события с официального сайта университета</p>
+    </div>
+    {% if events %}
+    <div class="parsed-events-grid">
+      {% for event in events %}
+      <a href="{% url 'parsed_event_detail' event.pk %}" class="parsed-card">
+        <a href="{% url 'parsed_event_detail' event.pk %}" class="parsed-card">
+        {% if event.image_url %}
+          <div class="card-image" style="height: 180px; overflow: hidden;">
+            <img src="{{ event.image_url }}" alt="{{ event.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+        {% endif %}
+        <div class="card-date">
+          {% if event.date_at %}{{ event.date_at|date:"d.m.Y" }}{% else %}Дата уточняется{% endif %}
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">{{ event.title }}</h2>
+          {% if event.excerpt %}
+          <p class="card-excerpt">{{ event.excerpt|truncatewords:25 }}</p>
+          {% elif event.content_plain %}
+          <p class="card-excerpt">{{ event.content_plain|truncatewords:25 }}</p>
+          {% endif %}
+        </div>
+        <div class="card-footer">
+          <span class="btn-card btn-primary-card">Подробнее</span>
+          {% if event.source_url %}
+          <a href="{{ event.source_url }}" target="_blank" rel="noopener" class="btn-card btn-outline-card" onclick="event.stopPropagation();">Источник</a>
+          {% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="parsed-empty">
+      <p>Пока нет анонсов. Запустите парсер: <code>python manage.py parse_mpgu_events</code></p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock content %}

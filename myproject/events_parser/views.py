@@ -18,7 +18,9 @@ def parsed_event_detail(request, pk):
 
 @login_required(login_url='login')
 def join_parsed_event(request, pk):
-    """Запись на спарсенное мероприятие."""
     event = get_object_or_404(ParsedEvent, pk=pk)
-    messages.success(request, f'Вы записались на мероприятие "{event.title}"')
-    return redirect('events')
+    if request.method == 'POST':
+        # Логика записи (например, сохранение в базу данных)
+        messages.success(request, f'Вы успешно записались на мероприятие "{event.title}"')
+        return redirect('parsed_event_detail', pk=pk)
+    return redirect('parsed_event_list')
