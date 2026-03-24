@@ -94,24 +94,44 @@ def login(request):
                 messages.success(request,f'Добро пожаловать,{user.username}!')
                 return redirect("profile")
             else:
-                messages.error(request,'Неверный username или пароль')
+                #messages.error(request,'Неверный username или пароль')
                 return redirect("login")
     return render(request,'registration/login.html')
 
 def forgotpassword(request):
-    if request.method=='POST':
-        username=request.POST.get('username')
+    if request.method == 'POST':
+        username = request.POST.get('username')
         try:
             user = User.objects.get(username=username)
             return redirect("resetpassword", username=user.username)
         except User.DoesNotExist:
-            messages.error(request,'Нет такого пользователя')
+            messages.error(request, 'Нет такого пользователя')
             return redirect("forgotpassword")
         
-    return render(request,"registration/forgotpassword.html")
+    return render(request, "registration/forgotpassword.html")
 
-def resetpassword(request,username):
-    return render(request,"registration/resetpassword.html",{'username':username})
+def resetpassword(request, username):
+    # Находим пользователя сразу, чтобы выдать 404 если ника нет
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        messages.error(request, 'Ошибка доступа')
+        return redirect("forgotpassword")
+
+    if request.method == 'POST':
+        new_pass = request.POST.get('password')
+        confirm_pass = request.POST.get('confirm_password')
+
+        if new_pass == confirm_pass:
+            # Важно: используем set_password для хеширования
+            user.set_password(new_pass)
+            user.save()
+            messages.success(request, 'Пароль успешно изменен! Войдите в аккаунт.')
+            return redirect('login')
+        else:
+            messages.error(request, 'Пароли не совпадают')
+
+    return render(request, "registration/resetpassword.html", {'username': username})
 
 def profile(request):
     if not request.user.is_authenticated:
