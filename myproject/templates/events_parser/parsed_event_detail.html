@@ -15,9 +15,9 @@
                 {% endif %}
             </div>
 
-            <div class="col-md-6">
-                {% if event.image_url %}
-                    <img src="{{ event.image_url }}" class="img-fluid rounded mb-3 shadow-sm product-image" alt="{{ event.title }}">
+            <div class="col-md-5">
+                {% if first_image %}
+                    <img src="{{ first_image }}" class="img-fluid rounded mb-3 shadow-sm product-image" alt="{{ event.title }}">
                 {% else %} 
                     <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3" style="height: 350px; border: 1px dashed #dee2e6;">
                         <span class="text-muted">Изображение отсутствует</span>
@@ -25,7 +25,7 @@
                 {% endif %} 
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <h2 class="mb-3">{{ event.title }}</h2>
                 
                 <p class="text-muted mb-4">
@@ -43,9 +43,9 @@
                 </div>
 
                 <div class="mb-4 event-content-text">
-                    {% if event.content %}
+                    {% if new_content %}
                         <div class="parsed-html">
-                            {{ event.content|safe }}
+                            {{ new_content|safe }}
                         </div>
                     {% elif event.content_plain %}
                         <p style="white-space: pre-wrap;">{{ event.content_plain }}</p>
@@ -61,7 +61,7 @@
                     </button>
                     
                     {% if event.source_url %}
-                        <a href="{{ event.source_url }}" target="_blank" class="btn btn-link text-muted">
+                        <a href="{{ event.source_url }}" target="_blank"  class="btn btn-outline-success btn-lg mb-3 me-2">
                             Перейти на источник
                         </a>
                     {% endif %}
@@ -71,7 +71,7 @@
         
         <div class="row mt-4">
             <div class="col-12">
-                <a href="{% url 'parsed_event_list' %}" class="text-decoration-none">
+                <a href="{% url 'parsed_event_list' %}" class="btn btn-outline-secondary btn-lg mb-2">
                     <i class="bi bi-arrow-left"></i> Вернуться к списку анонсов
                 </a>
             </div>

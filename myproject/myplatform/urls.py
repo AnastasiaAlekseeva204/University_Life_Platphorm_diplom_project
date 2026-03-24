@@ -23,4 +23,5 @@ urlpatterns = [
     path('forgotpassword',views.forgotpassword,name='forgotpassword'),
     path('resetpassword/<str:username>/',views.resetpassword,name='resetpassword'),
     path('activeratingpoints',views.activeratingpoints,name='activeratingpoints'),
+    path('parser_event/<int:event_id>/delete',views.delete_event_parser,name='delete_event_parser'),
 ]

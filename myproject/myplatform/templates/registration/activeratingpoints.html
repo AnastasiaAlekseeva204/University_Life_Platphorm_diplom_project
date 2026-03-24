@@ -33,6 +33,12 @@
                                     <p class="text-muted mb-0">Сообществ выбрано</p>
                                 </div>
                             </div>
+                            <div class="col-md-6">
+                                <div class="p-2">
+                                    <h2 class="text-success fw-bold">{{ user.parsed_event_joined.count }}</h2>
+                                    <p class="text-muted mb-0">Анонсов выбрано</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -40,9 +46,9 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body p-4">
                         <h6 class="fw-bold mb-3"><i class="fas fa-calendar-check text-primary me-2"></i>Ваши мероприятия</h6>
-                        <div class="list-group list-group-flush">
+                        <div class="list-group">
                             {% for event in user.events_joined.all %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
                                     <div>
                                         <span class="fw-medium">{{ event.name }}</span>
                                         <br>
@@ -52,6 +58,26 @@
                                 </div>
                             {% empty %}
                                 <p class="text-muted">Вы пока не записались ни на одно мероприятие.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body p-4">
+                        <h6 class="fw-bold mb-3"><i class="fas fa-calendar-check text-primary me-2"></i>Ваши анонсы</h6>
+                        <div class="list-group">
+                            {% for event in user.parsed_event_joined.all %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center px-0 border-0">
+                                    <div>
+                                        <span class="fw-medium">{{ event.title }}</span>
+                                        <br>
+                                        <small class="text-muted">Запись подтверждена</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">+10 баллов</span>
+                                </div>
+                            {% empty %}
+                                <p class="text-muted">Вы пока не записались ни на один анонс.</p>
                             {% endfor %}
                         </div>
                     </div>

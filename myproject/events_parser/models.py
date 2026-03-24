@@ -1,6 +1,7 @@
 from django.db import models
 from ckeditor.fields import RichTextField
-
+from bs4 import BeautifulSoup
+from myplatform.models import User
 
 class ParsedEvent(models.Model):
     """Событие, спарсенное с сайта МПГУ."""
@@ -13,6 +14,26 @@ class ParsedEvent(models.Model):
     image_url = models.URLField("URL изображения", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    participants = models.ManyToManyField(   
+        User,
+        related_name='parsed_event_joined',
+        blank=True,
+        verbose_name="Участники"
+    )
+    
+    def get_first_image(self):
+       soup = BeautifulSoup(self.content, features="html.parser")
+       first_img = soup.find('img')
+       if first_img:
+           return first_img['src']
+       return ""
+    
+    def clean_first_image(self):
+        soup = BeautifulSoup(self.content, features="html.parser")
+        first_img = soup.find('img')
+        if first_img:
+            first_img.decompose()
+        return str(soup)
 
     class Meta:
         verbose_name = "Спарсенное мероприятие"

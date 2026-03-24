@@ -42,6 +42,12 @@ def delete_event(request,event_id):
         messages.success(request,f'Вы отказались от участия в мероприятие "{delete_event.name}"')
     return render(request,"registration/profile.html")
 
+def delete_event_parser(request,event_id):
+    delete_event_parser = get_object_or_404(ParsedEvent,pk=event_id)
+    if delete_event_parser.participants.filter(id=request.user.id).exists():
+        delete_event_parser.participants.remove(request.user)
+        messages.success(request,f'Вы отказались от участия в анонсах"{delete_event_parser.title}"')
+    return render(request, "registration/profile.html")
 def communities(request):
     all_communities = Community.objects.all().order_by('-created_at')
     return render(request, 'communities.html', {'all_communities':all_communities})
