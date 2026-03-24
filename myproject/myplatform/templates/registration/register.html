@@ -1,71 +1,77 @@
 {% extends 'base.html' %}
 {% block title %}Регистрация{% endblock title %}
+
 {% block content %}
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-10 col-md-12 col-sm-12">
-                <div class="card shadow-lg">
-                    <div class="card-body">
-                        <h3 class="card-title text-center mb-4">Форма регистрации</h3>
-                        <form id="registrationForm">
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Full Name</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    id="name" 
-                                    placeholder="Enter your full name" 
-                                    required 
-                                />
-                                <div class="form-text">Please enter your full name.</div>
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h3 class="card-title text-center mb-4 fw-bold">Создать аккаунт</h3>
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Никнейм (Логин)</label>
+                                <input type="text" name="username" class="form-control" placeholder="ivanov777" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email address</label>
-                                <input 
-                                    type="email" 
-                                    class="form-control" 
-                                    id="email" 
-                                    placeholder="Enter your email" 
-                                    required 
-                                />
-                                <div class="form-text">Please enter a valid email address.</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="dob" class="form-label">Date of Birth</label>
-                                <input 
-                                    type="date" 
-                                    class="form-control" 
-                                    id="dob" 
-                                    required 
-                                />
-                            </div>
-                            <div class="mb-3">
-                                <label for="bio" class="form-label">Bio</label>
-                                <textarea 
-                                    class="form-control" 
-                                    id="bio" 
-                                    rows="3" 
-                                    placeholder="Tell us about yourself" 
-                                    required
-                                ></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="profileImage" class="form-label">Profile Image</label>
-                                <input 
-                                    type="file" 
-                                    class="form-control" 
-                                    id="profileImage" 
-                                    accept="image/*" 
-                                    required
-                                />
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">Кто вы?</label>
+                                <select name="role" class="form-select" required>
+                                    <option value="STUDENT">Студент</option>
+                                    <option value="ORGANIZER">Организатор сообществ</option>
+                                    <option value="ADMIN">Администратор</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Пароль</label>
+                            <input type="password" name="password" class="form-control" placeholder="Придумайте надежный пароль" required>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Фамилия</label>
+                                <input type="text" name="last_name_student" class="form-control" placeholder="Иванов" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Имя</label>
+                                <input type="text" name="name" class="form-control" placeholder="Иван" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Отчество</label>
+                                <input type="text" name="middle_name_student" class="form-control" placeholder="Иванович">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Дата рождения</label>
+                                <input type="date" name="birth_date" class="form-control">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Фото профиля</label>
+                                <input type="file" name="img" class="form-control" accept="image/*">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label">О себе</label>
+                            <textarea name="about_text" class="form-control" rows="3" placeholder="Расскажите немного о себе..."></textarea>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-lg px-5 shadow-sm">Зарегистрироваться</button>
+                        </div>
+                    </form>
                 </div>
+            </div>
         </div>
     </div>
-    <div class="text-center">
-        <button type="submit" class="btn btn-primary btn-lg">Зарегистрировать</button>
-        <div id="formFeedback" class="mt-3"></div>
-    </div>
+</div>
 {% endblock content %}

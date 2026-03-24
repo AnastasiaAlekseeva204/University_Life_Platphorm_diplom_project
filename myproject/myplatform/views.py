@@ -10,6 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login as auth_login
 
 
+
 def index(request):
     events = Event.objects.all().order_by('-date_time')[:3]
     community = Community.objects.all().order_by('-created_at')[:2]
@@ -138,6 +139,47 @@ def profile(request):
     events = Event.objects.all()
     faculties = Faculty.objects.all()
     return render(request,'registration/profile.html',{'events':events, 'faculties': faculties})
+
+
+
+def register(request):
+    if request.method == 'POST':
+        # Получаем данные
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        role = request.POST.get('role')
+
+        first_name = request.POST.get('name')
+        last_name = request.POST.get('last_name_student')
+        middle_name = request.POST.get('middle_name_student')
+        birth_date = request.POST.get('birth_date')
+        about = request.POST.get('about_text')
+        profile_img = request.FILES.get('img')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "Этот никнейм уже занят.")
+            return render(request, 'register.html')
+
+        user = User(
+            username=username,
+            role=role,
+            name=first_name,
+            last_name_student=last_name,
+            middle_name_student=middle_name,
+            about_text=about,
+            img=profile_img
+        )
+        
+        if birth_date:
+            user.birth_date = birth_date
+            
+        user.set_password(password)
+        user.save()
+
+        messages.success(request, "Регистрация прошла успешно! Теперь вы можете войти.")
+        return redirect('login')
+
+    return render(request, 'registration/register.html')
 
 def activeratingpoints(request):
     return render(request,'registration/activeratingpoints.html')
