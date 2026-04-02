@@ -25,13 +25,25 @@
             <div class="mb-3">
                 <span class="h4 me-2">{{event_det.get_formatted_date}}</span>
             </div>
+            <div class="h6 me-2">
+                <p>Максимальное количество участников: {{event_det.max_participants}}</p>
+            </div>
+            <div class="h6 me-2">
+                <p>Уже зарегистрированно: {{event_count}}</p>
+            </div>
             <p class="mb-4">{{event_det.description}}</p>
+            {% if event_count < event_det.max_participants %}
                 <form method="post" action="{% url 'join_event' event_det.id %}">
                     {% csrf_token %}
                     <button class="btn btn-outline-info btn-lg mb-3 me-2">
                         <i class="bi bi-heart"></i> Записаться
                     </button>
                 </form>
+            {% else %}
+                <div class="alert alert-primary" role="alert">
+                    Извините, к сожалению все места заняты, но есть надежда если место освободится, будем ждать!
+                </div>
+            {% endif %}
             </div>
         </div>
     </div>

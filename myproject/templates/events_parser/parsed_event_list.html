@@ -21,7 +21,12 @@
                         {{event.title}}
                     </h5>
                     <h6 class="card-subtitle mb-2 text-muted">
-                        {{event.date_time|date:"d.m.Y H:i"}}
+                         <span class="h6 me-2">
+                        📅 {{ event.date_at|date:"d.m.Y" }}
+                        {% if event.date_at|date:"H:i" != "00:00" %}
+                            | {{ event.date_at|date:"H:i" }}
+                        {% endif %}
+                    </span>
                     </h6>
                     <p class="card-text">
                         {{event.excerpt|truncatechars:150}}

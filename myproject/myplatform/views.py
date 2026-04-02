@@ -23,7 +23,8 @@ def events(request):
 
 def event_detail(request,event_id):
     event_det = get_object_or_404(Event,pk = event_id)
-    return render(request, 'event_detail.html', {'event_det': event_det})
+    event_count = event_det.participants.count()
+    return render(request, 'event_detail.html', {'event_det': event_det,'event_count': event_count})
 
 @login_required(login_url='login')
 def join_event(request,event_id):

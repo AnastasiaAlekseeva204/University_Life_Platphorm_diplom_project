@@ -7,10 +7,7 @@ https://mpgu.su/anonsyi/prazdnichnoe-posvjashhennoe-vossoedinenija/
 
 <div class="col-xs-12 col-sm-6 col-md-8">
 								<h1 class="deep-blue">Лидеры образования России – студентам МПГУ</h1>
-
-					
-						<h3>
-							18/03/2026						</h3>
+								<h3>18/03/2026</h3>
 
 2) для class ParsedEvent добавить поле - опубликовать в событиях + админка
 

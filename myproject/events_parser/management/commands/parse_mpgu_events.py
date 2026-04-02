@@ -27,7 +27,10 @@ class Command(BaseCommand):
         self.stdout.write(f"Найдено событий: {len(events)}")
         created = updated = 0
         for ev in events:
-            date_at = parse_date_dot(ev["date_str"])
+            #date_at = parse_date_dot(ev["date_str"])
+            date_at = ev.get("event_date")
+            if not date_at:
+                date_at = parse_date_dot(ev["date_str"])
             obj, was_created = ParsedEvent.objects.update_or_create(
                 source_url=ev["link"],
                 defaults={

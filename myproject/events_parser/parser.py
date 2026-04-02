@@ -7,6 +7,8 @@ import requests
 from bs4 import BeautifulSoup
 from datetime import datetime
 from urllib.parse import urljoin
+from django.utils import timezone
+ 
 
 URL = "https://mpgu.su/anonsyi/"
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
@@ -27,6 +29,7 @@ def fetch_event_detail(page_url: str, text_max_length: int = 50000):
     except requests.RequestException:
         return "", "", "", ""
     soup = BeautifulSoup(resp.text, "html.parser")
+    event_date = parse_date_from_page(soup)
 
     # Извлечение изображения
     image_url = ""
@@ -100,7 +103,7 @@ def fetch_event_detail(page_url: str, text_max_length: int = 50000):
         if rs:
             content_html = "".join(str(c) for c in rs.contents).strip()
 
-    return qwen_text, content_text, content_html, image_url
+    return qwen_text, content_text, content_html, image_url,event_date
 
 
 def parse_date_dot(raw_date: str) -> datetime | None:
@@ -181,13 +184,34 @@ def fetch_listing(fetch_details: bool = True):
         seen.add(title)
         ev = {"name": title, "link": link, "date_str": date_str}
         if fetch_details and link:
-            qwen_text, content_text, content_html, image_url = fetch_event_detail(link)
+            qwen_text, content_text, content_html, image_url,event_date = fetch_event_detail(link)
             ev["excerpt"] = qwen_text
             ev["content_text"] = content_text
             ev["content_html"] = content_html
             ev["image_url"] = image_url
+            ev["event_date"] = event_date
         else:
+            ev["event_date"] = None 
             ev["excerpt"] = ev["content_text"] = ev["content_html"] = ev["image_url"] = ""
         events.append(ev)
 
     return events, None
+ 
+ 
+def parse_date_from_page(soup):
+    """Извлекает дату из h3 на странице события с часовым поясом."""
+    h1 = soup.find("h1", class_="deep-blue")
+    if h1:
+        h3 = h1.find_next_sibling("h3")
+        if h3:
+            text = h3.get_text(strip=True)
+            # Поддерживаем форматы: 17/04/2026 и 17.04.2026
+            match = re.search(r'(\d{2})[/\.](\d{2})[/\.](\d{4})', text)
+            if match:
+                day, month, year = match.groups()
+                # Создаем aware datetime (с часовым поясом)
+                naive_date = datetime(int(year), int(month), int(day), 10, 0)
+                print(naive_date)
+                return timezone.make_aware(naive_date)
+    return None
+ 
