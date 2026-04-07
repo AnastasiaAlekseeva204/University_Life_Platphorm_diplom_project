@@ -56,16 +56,18 @@ def communities(request):
 
 def community_detail(request,community_id):
     com_det = get_object_or_404(Community,pk = community_id)
-    return render(request,'community_detail.html', {'com_det': com_det})
+    com_count = com_det.participants.count()
+    return render(request,'community_detail.html', {'com_det': com_det,'com_count': com_count})
 
 def join_community(request,community_id):
     community = get_object_or_404(Community,pk=community_id)
+    com_count = community.participants.count()
     if community.participants.filter(id=request.user.id).exists():
         messages.warning(request,"Вы участник")
     else:
         community.participants.add(request.user)
         messages.success(request,"Вы присоединились")
-    return render(request,'community_detail.html',{'com_det':community})
+    return render(request,'community_detail.html',{'com_det':community, 'com_count':com_count})
 
 def delete_community(request,community_id):
     delete_community = get_object_or_404(Community,pk=community_id)

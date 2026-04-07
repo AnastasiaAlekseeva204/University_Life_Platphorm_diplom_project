@@ -42,6 +42,7 @@ class Community(models.Model):
         WAIT = "WAIT", 'wait'
     name = models.CharField(max_length=200,verbose_name="Название сообщества")
     description = models.TextField(verbose_name="Описание")
+    max_participants = models.PositiveIntegerField(verbose_name="Максимальное количество участников",default=0)
     organizator = models.ForeignKey(
         User,
         on_delete = models.CASCADE,
