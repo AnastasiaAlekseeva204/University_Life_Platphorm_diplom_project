@@ -14,7 +14,8 @@ from django.contrib.auth import authenticate, login as auth_login
 def index(request):
     events = Event.objects.all().order_by('-date_time')[:3]
     community = Community.objects.all().order_by('-created_at')[:2]
-    return render(request, 'index.html',{'events': events,'community':community})
+    events_parsed = ParsedEvent.objects.all().order_by('-created_at')[:3]
+    return render(request, 'index.html',{'events': events,'community':community,'events_parsed': events_parsed})
 
 def events(request):
     all_events = Event.objects.all().order_by('-date_time')

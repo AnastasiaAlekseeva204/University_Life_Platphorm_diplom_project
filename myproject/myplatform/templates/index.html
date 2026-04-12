@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-12">
             <p class="lead">
-                Рады вас видеть! Это супер пупер платформа! 
+                Рады вас видеть! Здесь вы найдете все, что вам может понравится! 
             </p>
         </div>
     </div>
@@ -106,5 +106,53 @@
         </div>
     </div>
 </section>
+
+<section class="featured-products-section py-5">
+    <div class="container">
+        <div class="section-header text-center mb-5 reveal">
+            <h2 class="fw-bold">Анонсы парсинга МПГУ</h2>
+            <p class="text-muted">Здесь собранна информация о всех мероприятиях МПГУ, которые можно посмотреть сразу переходя в источник</p>
+        </div>
+        <div class="row g-4 products-grid">
+            {% for event in events_parsed %}
+                <div class="col-md-4 product-card reveal-item">
+                    <div class="product-card-inner">
+                        <div class="product-image">
+                            {% if event.img %}
+                                <img src="https://images.samsung.com/is/image/samsung/assets/mx/offer/holiday/QN65S90FAFXZX_FT12_570x304_desk.png" alt="Smart TV QLED 65">
+                            {% else %}
+                                <img src="https://images.samsung.com/is/image/samsung/assets/mx/offer/holiday/QN65S90FAFXZX_FT12_570x304_desk.png" alt="Smart TV QLED 65">
+                            {% endif %}
+                        </div>
+                        <h6>{{event.title}}</h6>
+                        <div class="text-center">
+                           <a href="{% url 'parsed_event_detail' event.pk %}" class="btn btn-primary">Подробнее</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const items = document.querySelectorAll('.reveal-item');
+
+    const observer = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) {
+        items.forEach((item, index) => {
+          setTimeout(() => {
+            item.classList.add('active');
+          }, index * 180);
+        });
+        observer.disconnect();
+      }
+    }, { threshold: 0.3 });
+
+    observer.observe(document.querySelector('.products-grid'));
+  });
+</script>
 {% endif %}
 {% endblock content %}
