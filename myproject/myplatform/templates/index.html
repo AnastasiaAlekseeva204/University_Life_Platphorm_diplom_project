@@ -118,13 +118,15 @@
                 <div class="col-md-4 product-card reveal-item">
                     <div class="product-card-inner">
                         <div class="product-image">
-                            {% if event.img %}
-                                <img src="https://images.samsung.com/is/image/samsung/assets/mx/offer/holiday/QN65S90FAFXZX_FT12_570x304_desk.png" alt="Smart TV QLED 65">
+                            {% if event.get_first_image %}
+                                <img src="{{event.get_first_image}}" alt="{{ event.title }}">
                             {% else %}
-                                <img src="https://images.samsung.com/is/image/samsung/assets/mx/offer/holiday/QN65S90FAFXZX_FT12_570x304_desk.png" alt="Smart TV QLED 65">
+                                <img src="/media/image/no_image.jpg" alt="{{ event.title }}">
                             {% endif %}
                         </div>
-                        <h6>{{event.title}}</h6>
+                        <h6>
+                            <a class="link" href="{% url 'parsed_event_detail' event.pk %}">{{event.title}}</a>    
+                        </h6>
                         <div class="text-center">
                            <a href="{% url 'parsed_event_detail' event.pk %}" class="btn btn-primary">Подробнее</a>
                         </div>

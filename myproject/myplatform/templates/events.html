@@ -35,6 +35,11 @@
                                 Макс. участников: {{ event.max_participants }}
                             </small>
                         </div>
+                        <div class="event-card">
+                            <div class="rating-badge">
+                                <i class="fas fa-heart"></i> <span>{{ event.rating }} баллов</span>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">
                                 Создано: {{ event.created_at|date:"d.m.Y" }}

@@ -29,6 +29,11 @@
                             <small class="text-muted">
                                 Создано: {{ communitie.created_at|date:"d.m.Y" }}
                             </small>
+                            <div class="community-card">
+                                <div class="rating-badge">
+                                    <i class="fas fa-heart"></i> <span>{{ communitie.rating }} баллов</span>
+                                </div>
+                            </div>
                             <a href="{% url 'community_detail' community_id=communitie.id %}" class="btn btn-primary">Подробнее</a>
                         </div>
                     </div>

@@ -60,6 +60,7 @@ class Community(models.Model):
     status = models.CharField(max_length=50,choices=Status.choices,default=Status.ISNOTACTIVE,verbose_name='Статус')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    rating = models.PositiveIntegerField(verbose_name="Количество баллов",default=0)
     def __str__(self):
         return f"{self.name}"
 
@@ -84,6 +85,7 @@ class Event(models.Model):
     max_participants = models.PositiveIntegerField(verbose_name="Максимальное количество участников")
     img = models.ImageField(verbose_name='Фото мероприятий',upload_to='image/events',blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    rating = models.PositiveIntegerField(verbose_name="Количество баллов",default=0)
     def __str__(self):
         return f"{self.name}"
     

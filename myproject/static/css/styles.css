@@ -120,6 +120,37 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     transition: transform .35s ease, box-shadow .35s ease;
 }
+.product-card-inner a.link{
+    color: #03045e;
+    text-decoration: none;
+}
+.product-card-inner a.link:hover{
+    color: #00afb9;
+    text-decoration: underline;
+}
+
+.rating-badge {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, #ff416c, #ff4b2b); /* Красивый красный градиент */
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(255, 75, 43, 0.3);
+    transition: transform 0.2s;
+    cursor: default;
+}
+
+.rating-badge i {
+    margin-right: 8px; /* Отступ между сердечком и текстом */
+}
+
+.rating-badge:hover {
+    transform: scale(1.05); /* Легкое увеличение при наведении */
+}
+
 
     /* CONTENEDOR CUADRADO */
 .product-image {
