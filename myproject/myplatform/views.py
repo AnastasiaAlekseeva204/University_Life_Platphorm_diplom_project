@@ -23,6 +23,10 @@ def index(request):
     events_parsed = ParsedEvent.objects.all().order_by('?')[:3]
     return render(request, 'index.html',{'events': events,'community':community,'events_parsed': events_parsed})
 
+def presentation(request):
+    from django.http import HttpResponse
+    return HttpResponse("Страница презентации в разработке")
+
 def events(request):
     all_events = Event.objects.all().order_by('-date_time')
     parsed_events = ParsedEvent.objects.all().order_by('-date_at')
