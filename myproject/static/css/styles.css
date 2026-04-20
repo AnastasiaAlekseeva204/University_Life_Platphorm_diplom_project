@@ -19,6 +19,10 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); 
 } 
 
+.myb{
+    border-radius: 20px;
+}
+
 .gradient-hero p { 
     font-size: 1.2rem; 
     margin-bottom: 2rem; 

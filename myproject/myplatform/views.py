@@ -17,6 +17,60 @@ def index(request):
     events_parsed = ParsedEvent.objects.all().order_by('?')[:3]
     return render(request, 'index.html',{'events': events,'community':community,'events_parsed': events_parsed})
 
+
+def _markdown_inline_to_html(text):
+    return mark_safe(re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", text))
+
+
+def _load_presentation_slides():
+    source_path = Path(settings.BASE_DIR).parent / "presentation.md"
+    if not source_path.exists():
+        return [{
+            "title": "Презентация недоступна",
+            "paragraphs": ["Файл presentation.md не найден в корне проекта."],
+            "bullets": [],
+        }]
+
+    raw_content = source_path.read_text(encoding="utf-8")
+    sections = [section.strip() for section in raw_content.split("---") if section.strip()]
+    slides = []
+
+    for section in sections:
+        lines = [line.rstrip() for line in section.splitlines() if line.strip()]
+        if not lines:
+            continue
+
+        title_line_idx = next((idx for idx, line in enumerate(lines) if line.strip().startswith("## ")), 0)
+        raw_title = lines[title_line_idx].lstrip("# ").strip()
+        if ":" in raw_title:
+            _, slide_title = raw_title.split(":", 1)
+            slide_title = slide_title.strip()
+        else:
+            slide_title = raw_title
+
+        paragraphs = []
+        bullets = []
+        for line in lines[title_line_idx + 1:]:
+            stripped = line.strip()
+            if stripped.startswith("- "):
+                bullets.append(_markdown_inline_to_html(stripped[2:].strip()))
+            else:
+                paragraphs.append(_markdown_inline_to_html(stripped))
+
+        slides.append({
+            "title": slide_title,
+            "paragraphs": paragraphs,
+            "bullets": bullets,
+        })
+
+    return slides
+
+
+def presentation(request):
+    slides = _load_presentation_slides()
+    return render(request, 'presentation.html', {"slides": slides, "total_slides": len(slides)})
+
+
 def events(request):
     all_events = Event.objects.all().order_by('-date_time')
     parsed_events = ParsedEvent.objects.all().order_by('-date_at')
