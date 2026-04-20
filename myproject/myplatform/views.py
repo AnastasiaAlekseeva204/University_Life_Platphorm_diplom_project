@@ -66,10 +66,6 @@ def _load_presentation_slides():
     return slides
 
 
-def presentation(request):
-    slides = _load_presentation_slides()
-    return render(request, 'presentation.html', {"slides": slides, "total_slides": len(slides)})
-
 
 def events(request):
     all_events = Event.objects.all().order_by('-date_time')
