@@ -37,7 +37,12 @@
                     {% endif %}
                 </div>
                 <div class="col-md-6">
-                    <h2 class="fw-bold mb-4">{{com_det.name}}</h2>
+                    <h2 class="fw-bold">{{com_det.name}}</h2>
+                    <div class="community-card">
+                        <div class="rating-badge">
+                            <i class="fas fa-heart"></i> <span>{{ com_det.rating }} баллов</span>
+                        </div>
+                    </div>
                     <p class="lead text-muted mb-4">{{com_det.description}}</p>
                     <div class="row text-center">
                         <div class="col-4">
@@ -58,6 +63,7 @@
                         <br>
                         Максимальное количество: {{com_det.max_participants}}
                     </div>
+                    
                 </div>
             </div>
         </div>

@@ -70,6 +70,7 @@ def community_detail(request,community_id):
     com_count = com_det.participants.count()
     return render(request,'community_detail.html', {'com_det': com_det,'com_count': com_count})
 
+@login_required(login_url='login')
 def join_community(request,community_id):
     community = get_object_or_404(Community,pk=community_id)
     com_count = community.participants.count()
@@ -151,6 +152,7 @@ def profile(request):
     if not request.user.is_authenticated:
         messages.warning(request,'Пожалуйста войдите в систему, чтобы посмотреть профиль')
         return redirect("login")
+    user = request.user
     if request.method=='POST':
         user = request.user
         user.name = request.POST.get('name', '')
@@ -171,8 +173,12 @@ def profile(request):
         messages.success(request, 'Профиль успешно обновлен')
         return redirect('profile')
     events = Event.objects.all()
+    join_events = user.events_joined.all()
+    total_rating_event = sum(event.rating for event in join_events)
     faculties = Faculty.objects.all()
-    return render(request,'registration/profile.html',{'events':events, 'faculties': faculties})
+    join_communitys = user.communities_joined.all()
+    total_rating_community = sum(community.rating for community in join_communitys)
+    return render(request,'registration/profile.html',{'events':events, 'faculties': faculties, 'total_rating_event':total_rating_event,'total_rating_community':total_rating_community})
 
 
 

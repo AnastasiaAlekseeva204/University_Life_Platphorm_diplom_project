@@ -117,6 +117,8 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Название</th>
+                                                    <th>Баллы</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -127,6 +129,13 @@
                                                         </td>
                                                         <td>
                                                             {{event.name}}
+                                                        </td>
+                                                        <td>
+                                                             <div class="event-card">
+                                                                <div class="rating-badge">
+                                                                    <i class="fas fa-heart"></i> <span>{{event.rating}}</span>
+                                                                </div>
+                                                            </div>
                                                         </td>
                                                         <td>
                                                             <form method="post" action="{% url 'delete_event' event.id %}">
@@ -140,6 +149,16 @@
                                                 {% endfor %}
                                             </tbody>
                                         </table>
+                                        <div class="my_total_rating">
+                                            <span>
+                                                <b>
+                                                    Всего:
+                                                </b>
+                                            </span>
+                                            <div class="rating-badge">
+                                                <i class="fas fa-heart"></i> {{total_rating_event}} баллов
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 {% endif %}
@@ -152,6 +171,8 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Название</th>
+                                                    <th>Баллы</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -162,6 +183,13 @@
                                                         </td>
                                                         <td>
                                                             {{community.name}}
+                                                        </td>
+                                                        <td>
+                                                            <div class="community-card">
+                                                                <div class="rating-badge">
+                                                                    <i class="fas fa-heart"></i> <span>{{community.rating}}</span>
+                                                                </div>
+                                                            </div>
                                                         </td>
                                                         <td>
                                                             <form method="post" action="{% url 'delete_community' community.id %}">
@@ -175,6 +203,16 @@
                                                 {% endfor %}
                                             </tbody>
                                         </table>
+                                        <div class="my_total_rating">
+                                            <span>
+                                                <b>
+                                                    Всего:
+                                                </b>
+                                            </span>
+                                            <div class="rating-badge">
+                                                <i class="fas fa-heart"></i> {{total_rating_community }}  баллов
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 {% endif %}
@@ -187,6 +225,7 @@
                                                 <tr>
                                                     <th>#</th>
                                                     <th>Название</th>
+                                                    <th></th>
                                                 </tr>
                                             </thead>
                                             <tbody>
