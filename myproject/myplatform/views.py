@@ -1,4 +1,5 @@
 from pathlib import Path
+import html
 import re
 
 from django.conf import settings
@@ -23,9 +24,70 @@ def index(request):
     events_parsed = ParsedEvent.objects.all().order_by('?')[:3]
     return render(request, 'index.html',{'events': events,'community':community,'events_parsed': events_parsed})
 
+PRES_PATH = Path(settings.BASE_DIR).parent / "dipoma" / "presa.md"
+
+
+def _presa_inline_bold(text: str):
+    esc = html.escape(text, quote=True)
+    return mark_safe(re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", esc))
+
+
+def _presa_strip_noise(body: str) -> str:
+    lines_out = []
+    for line in body.splitlines():
+        s = line.strip()
+        if not s or s == "---":
+            continue
+        if re.match(r"^##\s+Блок\b", s):
+            continue
+        if re.match(r"^\*Устно:\*", s) or re.match(r"^Устно:", s):
+            continue
+        lines_out.append(line)
+    return "\n".join(lines_out)
+
+
+def load_presa_slides():
+    """Парсинг dipoma/presa.md: слайды по строкам «### Слайд N. …»."""
+    if not PRES_PATH.is_file():
+        return []
+    raw = PRES_PATH.read_text(encoding="utf-8")
+    parts = re.split(r"(?m)^(###\s+Слайд\s+\d+\..+)$", raw)
+    slides = []
+    for i in range(1, len(parts), 2):
+        if i + 1 >= len(parts):
+            break
+        title_line = parts[i].strip()
+        body = _presa_strip_noise(parts[i + 1])
+        heading = re.sub(r"^#+\s*", "", title_line).strip()
+        # Убираем префикс «Слайд N. » из заголовка (остаётся только тема слайда)
+        heading = re.sub(r"^Слайд\s+\d+\.\s*", "", heading, flags=re.IGNORECASE)
+        if heading == "Титульный":
+            heading = ""
+        bullets = []
+        paragraphs = []
+        for raw_line in body.splitlines():
+            s = raw_line.strip()
+            if not s:
+                continue
+            if s.startswith("- "):
+                bullets.append(_presa_inline_bold(s[2:].strip()))
+            else:
+                paragraphs.append(_presa_inline_bold(s))
+        slides.append({
+            "heading": heading,
+            "bullets": bullets,
+            "paragraphs": paragraphs,
+        })
+    return slides
+
+
 def presentation(request):
-    from django.http import HttpResponse
-    return HttpResponse("Страница презентации в разработке")
+    slides = load_presa_slides()
+    return render(
+        request,
+        "presentation_slides.html",
+        {"slides": slides, "total_slides": len(slides)},
+    )
 
 def events(request):
     all_events = Event.objects.all().order_by('-date_time')

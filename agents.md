@@ -1,3 +1,11 @@
+http://127.0.0.1:8000/presentation
+сделай на основе dipoma\presa.md
+референс по оформлению PRESA\lect_k8s.html
+стили - PRESA\css, js - PRESA\js
+
+можно использовать для создания PRESA\build_lect_k8s_net_gitops_reveal.py
+
+
 создай часть 3 для диплома по тз dipoma\part3.md на 10 страниц + добавь 
 
 добавь схемы (mermaid или тп):

@@ -1,0 +1,509 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Презентация ВКР — МПГУ</title>
+  <link rel="stylesheet" href="{% static 'presa/reveal.min.css' %}">
+  <link rel="stylesheet" href="{% static 'presa/black.min.css' %}">
+  <link rel="stylesheet" href="{% static 'presa/monokai.min.css' %}">
+  <style>
+    @keyframes k8s-glow {
+      0%, 100% { text-shadow: 0 0 20px rgba(50,108,229,0.5), 0 0 40px rgba(50,108,229,0.2); }
+      50% { text-shadow: 0 0 30px rgba(50,108,229,0.8), 0 0 60px rgba(0,212,170,0.25); }
+    }
+    @keyframes k8s-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    html, body, .reveal-viewport, .reveal, .reveal .slides, .reveal .slide-background-content {
+      overflow: hidden !important;
+      scrollbar-width: none !important;
+    }
+    .reveal .slides section.k8s-slide {
+      overflow-y: auto !important;
+      justify-content: center !important;
+      padding-top: 12px !important;
+      padding-bottom: 12px !important;
+    }
+    .k8s-slide, .k8s-title-slide {
+      position: relative !important;
+    }
+    /* Псевдоэлементы: не участвуют во flex Reveal, не ломают вертикальное центрирование */
+    .k8s-slide::before, .k8s-title-slide::before {
+      content: "";
+      position: absolute;
+      inset: -10%;
+      z-index: -1;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 10% 20%, var(--na) 0 3px, transparent 4px),
+        radial-gradient(circle at 82% 14%, var(--nb) 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 38% 78%, var(--nc) 0 3px, transparent 4px),
+        radial-gradient(circle at 90% 55%, var(--na) 0 2px, transparent 3px),
+        radial-gradient(circle at 22% 90%, var(--nb) 0 2.5px, transparent 3.5px),
+        radial-gradient(circle at 58% 42%, var(--nc) 0 2px, transparent 3px),
+        radial-gradient(circle at 70% 82%, var(--na) 0 2px, transparent 3px);
+      background-size: 100% 100%;
+      opacity: 0.55;
+      animation: neuralNodesPulse 9s ease-in-out infinite;
+    }
+    .k8s-slide::after, .k8s-title-slide::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      mix-blend-mode: screen;
+      background-image:
+        linear-gradient(112deg, transparent 46%, var(--nd) 48.5%, var(--nd) 51.5%, transparent 54%),
+        linear-gradient(28deg, transparent 45%, var(--nd) 47.5%, var(--nd) 52.5%, transparent 55%),
+        linear-gradient(154deg, transparent 48%, var(--nd) 49.8%, var(--nd) 50.2%, transparent 52%),
+        linear-gradient(90deg, var(--nd) 1px, transparent 1px),
+        linear-gradient(0deg, var(--nd) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 100% 100%, 88px 88px, 88px 88px;
+      background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+      opacity: 0.55;
+      animation: neuralMeshShift 20s linear infinite;
+    }
+    .k8s-title-slide::before { opacity: 0.4; }
+    .k8s-title-slide::after { opacity: 0.45; }
+    @keyframes neuralNodesPulse {
+      0%, 100% { opacity: 0.45; filter: brightness(1); }
+      50% { opacity: 0.72; filter: brightness(1.12); }
+    }
+    @keyframes neuralMeshShift {
+      0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; opacity: 0.5; }
+      50% { background-position: 8% -5%, -6% 4%, 4% 7%, 36px 22px, -24px 40px; opacity: 0.75; }
+      100% { background-position: 0 0, 0 0, 0 0, 72px 64px, 48px -40px; opacity: 0.5; }
+    }
+    .k8s-slide > h2 {
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+    .reveal .slides {
+      width: 82% !important;
+      height: 92% !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) scale(1.12) !important;
+      transform-origin: center center !important;
+    }
+    .reveal .slides section {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 20px 28px !important;
+      font-size: 0.88em !important;
+      max-width: 100% !important;
+      text-align: center !important;
+      line-height: 1.48 !important;
+    }
+    .reveal h1 {
+      font-size: 1.85em !important;
+      color: #fff !important;
+      animation: k8s-glow 4s ease-in-out infinite !important;
+    }
+    .reveal h2 {
+      font-size: 1.05em !important;
+      color: #7eb8ff !important;
+      border-bottom: 2px solid rgba(50,108,229,0.55) !important;
+      padding-bottom: 0.35em !important;
+      margin-bottom: 0.45em !important;
+      width: 100% !important;
+      text-transform: none !important;
+    }
+    .k8s-title-slide .k8s-title-h1 {
+      font-size: 2.2em !important;
+      background: linear-gradient(90deg, #fff, #7eb8ff, #00d4aa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent !important;
+      animation: k8s-glow 3s ease-in-out infinite !important;
+    }
+    .k8s-title-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(13,17,23,0.75);
+      border: 2px solid rgba(50,108,229,0.6);
+      border-radius: 16px;
+      padding: 36px 48px;
+      max-width: 92%;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .k8s-helm {
+      font-size: 3.5rem;
+      line-height: 1;
+      margin-bottom: 0.2em;
+      animation: k8s-float 3.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(50,108,229,0.7));
+    }
+    .k8s-title-sub {
+      font-size: 1.15em !important;
+      color: #c9d1d9 !important;
+      margin-top: 0.5em !important;
+    }
+    .k8s-title-meta {
+      color: #8b949e !important;
+      font-size: 0.9em !important;
+      margin-top: 1em !important;
+    }
+    .k8s-slide-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 100%;
+      min-height: 0;
+      flex-shrink: 0;
+      text-align: left;
+    }
+    .k8s-slide-inner p {
+      margin: 0.35em 0;
+      text-align: left;
+    }
+    .k8s-ul, .k8s-ol {
+      margin: 0.4em auto !important;
+      max-width: 95%;
+      text-align: left !important;
+    }
+    .k8s-ul li {
+      margin-bottom: 0.45em !important;
+      list-style: none !important;
+      position: relative !important;
+      padding-left: 1.1em !important;
+    }
+    .k8s-ul li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: #326CE5;
+      font-weight: bold;
+    }
+    .k8s-ol {
+      list-style: decimal !important;
+      padding-left: 1.6em !important;
+      margin-left: 0.5em !important;
+    }
+    .k8s-ol li {
+      margin-bottom: 0.45em !important;
+      padding-left: 0.15em !important;
+    }
+    .k8s-code {
+      color: #79c0ff !important;
+      background: rgba(110,118,129,0.2) !important;
+      padding: 0.12em 0.35em !important;
+      border-radius: 4px !important;
+      font-size: 0.92em !important;
+    }
+    .k8s-pre {
+      max-width: 100% !important;
+      margin: 10px auto !important;
+      border-radius: 10px !important;
+      border: 1px solid rgba(50,108,229,0.45) !important;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.35) !important;
+      text-align: left !important;
+      font-size: 0.62em !important;
+    }
+    .k8s-pre code {
+      padding: 12px 14px !important;
+      line-height: 1.35 !important;
+      white-space: pre-wrap !important;
+      word-break: break-word !important;
+      max-height: 52vh;
+      overflow-y: auto;
+      display: block;
+    }
+    .mermaid-wrap {
+      max-width: 100%;
+      margin: 8px auto;
+    }
+    .mermaid-wrap--large {
+      max-width: 100%;
+      margin: 12px auto 4px;
+    }
+    .mermaid {
+      background: rgba(22,27,34,0.9) !important;
+      border-radius: 10px !important;
+      padding: 12px !important;
+      border: 1px solid rgba(0,212,170,0.35) !important;
+      text-align: center !important;
+      font-size: 0.55em !important;
+    }
+    .mermaid-wrap--large .mermaid {
+      font-size: 0.92em !important;
+      padding: 18px 14px !important;
+      min-height: 280px;
+    }
+    .mermaid-wrap--large .mermaid svg {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+    .k8s-table {
+      font-size: 0.72em !important;
+      margin: 10px auto !important;
+      border-collapse: collapse !important;
+      max-width: 98% !important;
+    }
+    .k8s-table th, .k8s-table td {
+      border: 1px solid rgba(255,255,255,0.2) !important;
+      padding: 8px 10px !important;
+    }
+    .k8s-table th {
+      background: rgba(50,108,229,0.25) !important;
+      color: #7eb8ff !important;
+    }
+    .k8s-quote {
+      background: linear-gradient(90deg, rgba(50,108,229,0.15), transparent);
+      border-left: 4px solid #326CE5;
+      padding: 10px 16px;
+      margin: 8px 0;
+      border-radius: 0 8px 8px 0;
+      text-align: left !important;
+      font-style: italic;
+      color: #e6edf3 !important;
+    }
+    .k8s-lead { color: #00d4aa !important; }
+    .fragment.visible {
+      animation: fragmentFadeIn 0.55s ease-out;
+    }
+    @keyframes fragmentFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Генератор из lect_k8s помечает пункты как .fragment — без показа по шагам текст «пропадает» */
+    .reveal .slides section .fragment {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+    }
+  </style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<section data-transition="zoom" data-background-gradient="linear-gradient(135deg,#05122d 0%,#0a2e79 45%,#005bff 100%)" class="k8s-title-slide" style="--na: rgba(0,91,255,0.55); --nb: rgba(126,184,255,0.5); --nc: rgba(0,212,170,0.42); --nd: rgba(0,91,255,0.15);">
+  <div class="k8s-title-card">
+    <div class="k8s-helm" aria-hidden="true">🎓</div>
+    <h1 class="k8s-title-h1">ВКР · Веб-платформа МПГУ</h1>
+    <p class="k8s-title-sub">Внеучебная деятельность: анонсы, учёт, Django</p>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0d1117" class="k8s-slide" style="--na: rgba(59,130,246,0.7); --nb: rgba(34,211,238,0.55); --nc: rgba(167,139,250,0.5); --nd: rgba(96,165,250,0.22);">
+  <h2>Слайд 1. Титульный</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Тема ВКР:</strong> веб-платформа для учёта и анонсирования внеучебной деятельности студентов и сотрудников МПГУ (Django).</li>
+<li>Выпускная квалификационная работа; направление подготовки; <strong>Студент:</strong> Андреева Анастасия; <strong>Научный руководитель:</strong> доцент, ктн Серов Н.Е.; МПГУ; 2026.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#111827" class="k8s-slide" style="--na: rgba(99,102,241,0.65); --nb: rgba(56,189,248,0.55); --nc: rgba(244,114,182,0.4); --nd: rgba(129,140,248,0.2);">
+  <h2>Слайд 2. Какую проблему решает проект</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Проблема:</strong> информация о внеучебных мероприятиях разбросана (соцсети, сайты, объявления); нет единого места для записи, учёта участия и мотивации через рейтинг/портфолио.</li>
+<li><strong>Зачем платформа:</strong> снижение потерь информации, прозрачность для администрации, удобство для студентов.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#0f172a" class="k8s-slide" style="--na: rgba(96,165,250,0.68); --nb: rgba(45,212,191,0.52); --nc: rgba(147,197,253,0.45); --nd: rgba(56,189,248,0.18);">
+  <h2>Слайд 3. Целевая аудитория</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Основная:</strong> студенты МПГУ; организаторы мероприятий; администрация (деканаты, студсоветы).</li>
+<li><strong>Дополнительная:</strong> сотрудники, волонтёры; возможность масштабирования на другие вузы.</li>
+<li><strong>Потребности:</strong> актуальные анонсы, регистрация, учёт участия, рейтинги, единый интерфейс.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#1e1b4b" class="k8s-slide" style="--na: rgba(139,92,246,0.7); --nb: rgba(244,114,182,0.5); --nc: rgba(196,181,253,0.45); --nd: rgba(167,139,250,0.2);">
+  <h2>Слайд 4. Состояние проблемы</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li>Распространённые подходы: фрагментированные каналы (VK, Moodle-объявления, бумажные списки).</li>
+<li><strong>Ограничения:</strong> нет связки «официальный источник → автоматический сбор → единый каталог → учёт и мотивация» в одной системе.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0c4a6e" class="k8s-slide" style="--na: rgba(125,211,252,0.72); --nb: rgba(103,232,249,0.55); --nc: rgba(56,189,248,0.5); --nd: rgba(14,165,233,0.25);">
+  <h2>Слайд 5. Решения конкурентов / аналоги</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Moodle / LMS:</strong> учебный контент, не специализация на внеучебной активности и портфолио достижений.</li>
+<li><strong>Внешние соцсети:</strong> охват есть, но нет институционального учёта и ролевой модели «студент / организатор / админ».</li>
+<li><strong>Зарубежные кампус-платформы:</strong> социальные функции; слабее учёт достижений и интеграция с локальными источниками вуза.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#134e4a" class="k8s-slide" style="--na: rgba(52,211,153,0.7); --nb: rgba(163,230,53,0.45); --nc: rgba(110,231,183,0.5); --nd: rgba(45,212,191,0.22);">
+  <h2>Слайд 6. Новизна вашего проекта</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Автоматизация:</strong> парсинг анонсов с официального ресурса (BeautifulSoup, requests) → модель анонсов в БД.</li>
+<li><strong>Персонализация:</strong> роли, профиль, факультет, участие в событиях и сообществах.</li>
+<li><strong>Мотивация и учёт:</strong> рейтинговые механизмы, связь участия с данными профиля (логика портфолио/достижений — по вашей реализации).</li>
+<li><strong>Интеграция компонентов:</strong> единый Django-проект (приложения <code class="k8s-code">myplatform</code>, <code class="k8s-code">events_parser</code>).</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#0d1117" class="k8s-slide" style="--na: rgba(59,130,246,0.7); --nb: rgba(34,211,238,0.55); --nc: rgba(167,139,250,0.5); --nd: rgba(96,165,250,0.22);">
+  <h2>Слайд 7. Методы проектирования и разработки</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li>ООП, проектирование БД (Django ORM), веб-интерфейс (HTML/CSS, Bootstrap), парсинг HTML.</li>
+<li>Инструменты: Python 3, Django 5.x, Git, тестирование (по факту ВКР — указать покрытие/типы тестов).</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#111827" class="k8s-slide" style="--na: rgba(99,102,241,0.65); --nb: rgba(56,189,248,0.55); --nc: rgba(244,114,182,0.4); --nd: rgba(129,140,248,0.2);">
+  <h2>Слайд 8. Методология и основания (теории, концепции)</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Цифровизация вузовской среды:</strong> единый цифровой контур внеучебной жизни.</li>
+<li><strong>Реляционная модель данных:</strong> целостность, связи M2M/FK для участников и сущностей.</li>
+<li><strong>Принцип конструктивной согласованности:</strong> модули (UI, модели, парсер, админка) согласованы общей целью — <strong>учёт и доступность внеучебной активности</strong>; изменения в одном модуле не противоречат остальным (единые модели событий/пользователей, единая авторизация).</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#0f172a" class="k8s-slide" style="--na: rgba(96,165,250,0.68); --nb: rgba(45,212,191,0.52); --nc: rgba(147,197,253,0.45); --nd: rgba(56,189,248,0.18);">
+  <h2>Слайд 9. Цель проекта и ожидаемые эффекты</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Цель:</strong> централизованная платформа для анонсов, регистрации и учёта внеучебной активности.</li>
+<li><strong>Количественные эффекты (пример — подставьте свои цифры из пилота):</strong> сокращение времени поиска мероприятий; доля пользователей, нашедших событие за N минут; время отклика страниц; число обработанных анонсов.</li>
+<li><strong>Качественные эффекты:</strong> рост вовлечённости, прозрачность для администрации, формирование цифрового следа активности.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#1e1b4b" class="k8s-slide" style="--na: rgba(139,92,246,0.7); --nb: rgba(244,114,182,0.5); --nc: rgba(196,181,253,0.45); --nd: rgba(167,139,250,0.2);">
+  <h2>Слайд 10. Структура проекта (архитектура)</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Backend:</strong> Django (<code class="k8s-code">myplatform</code>, <code class="k8s-code">events_parser</code>).</li>
+<li><strong>Frontend:</strong> шаблоны, Bootstrap.</li>
+<li><strong>БД:</strong> SQLite (разработка) / PostgreSQL (целевой прод).</li>
+<li><strong>Медиа:</strong> изображения профилей, событий, сообществ.</li>
+<li>*(Схема: клиент → Django → ORM → БД; парсер → модели анонсов.)*</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0c4a6e" class="k8s-slide" style="--na: rgba(125,211,252,0.72); --nb: rgba(103,232,249,0.55); --nc: rgba(56,189,248,0.5); --nd: rgba(14,165,233,0.25);">
+  <h2>Слайд 11. Примеры модулей / фрагментов</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Модели:</strong> <code class="k8s-code">User</code> (роли), <code class="k8s-code">Event</code>, <code class="k8s-code">Community</code>, <code class="k8s-code">Faculty</code>, <code class="k8s-code">ParsedEvent</code> — кратко поля и связи.</li>
+<li><strong>Парсер:</strong> загрузка страницы, извлечение даты, описания, HTML, URL изображения; сохранение в <code class="k8s-code">ParsedEvent</code>.</li>
+<li><strong>UI:</strong> <code class="k8s-code">event_detail.html</code>, списки событий/сообществ, профиль.</li>
+<li><strong>Админка:</strong> управление сущностями.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#134e4a" class="k8s-slide" style="--na: rgba(52,211,153,0.7); --nb: rgba(163,230,53,0.45); --nc: rgba(110,231,183,0.5); --nd: rgba(45,212,191,0.22);">
+  <h2>Слайд 12. Пилот: где, как, с кем</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Где:</strong> МПГУ / локальный стенд (указать фактически).</li>
+<li><strong>Как:</strong> сценарии — регистрация, просмотр анонсов, запись на мероприятия, работа парсера; сбор обратной связи (опрос/интервью — если было).</li>
+<li><strong>Участники:</strong> N студентов, M организаторов, K администраторов; длительность пилота.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#0d1117" class="k8s-slide" style="--na: rgba(59,130,246,0.7); --nb: rgba(34,211,238,0.55); --nc: rgba(167,139,250,0.5); --nd: rgba(96,165,250,0.22);">
+  <h2>Слайд 13. Результаты пилота</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li>Метрики: число спарсенных мероприятий, регистраций, ошибок парсера, отзывы.</li>
+<li>Вывод по пилоту: гипотезы подтверждены / что доработать.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#111827" class="k8s-slide" style="--na: rgba(99,102,241,0.65); --nb: rgba(56,189,248,0.55); --nc: rgba(244,114,182,0.4); --nd: rgba(129,140,248,0.2);">
+  <h2>Слайд 14. Выводы</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li>Цель ВКР достигнута; реализованы ключевые функции; архитектура расширяема.</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0f172a" class="k8s-slide" style="--na: rgba(96,165,250,0.68); --nb: rgba(45,212,191,0.52); --nc: rgba(147,197,253,0.45); --nd: rgba(56,189,248,0.18);">
+  <h2>Слайд 15. Рекомендации и перспективы</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li><strong>Рекомендации:</strong> внедрение в инфраструктуру вуза, обучение пользователей, политика данных и безопасность.</li>
+<li><strong>Перспективы:</strong> уведомления, мобильный клиент, интеграция с VK/Telegram, аналитика и рекомендации по интересам (по желанию).</li>
+</ul>
+  </div>
+</section>
+
+</div></div>
+<script src="{% static 'presa/reveal.min.js' %}"></script>
+<script src="{% static 'presa/notes.min.js' %}"></script>
+<script src="{% static 'presa/markdown.min.js' %}"></script>
+<script src="{% static 'presa/highlight.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    fontFamily: 'trebuchet ms, verdana, sans-serif'
+  });
+
+  Reveal.initialize({
+    hash: true,
+    transition: 'slide',
+    transitionSpeed: 'default',
+    backgroundTransition: 'fade',
+    controls: true,
+    progress: true,
+    slideNumber: 'c/t',
+    center: true,
+    margin: 0.04,
+    fragments: false,
+    plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+  });
+
+  async function runMermaidOnSlide(slide) {
+    if (!slide) return;
+    var nodes = slide.querySelectorAll('.mermaid:not([data-processed])');
+    for (var i = 0; i < nodes.length; i++) {
+      try {
+        await mermaid.run({ nodes: [nodes[i]] });
+        nodes[i].setAttribute('data-processed', 'true');
+      } catch (e) { console.warn(e); }
+    }
+  }
+
+  Reveal.on('ready', function() {
+    document.querySelectorAll('.reveal .slides section .fragment').forEach(function(el) {
+      el.classList.add('visible');
+    });
+    runMermaidOnSlide(Reveal.getCurrentSlide());
+  });
+  Reveal.on('slidechanged', function(e) {
+    e.currentSlide.querySelectorAll('.fragment').forEach(function(el) {
+      el.classList.add('visible');
+    });
+    runMermaidOnSlide(e.currentSlide);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kubernetes: зачем и как он работает</title>
+  <link rel="stylesheet" href="../../../SEMESTR-1/15-16/css/reveal.min.css">
+  <link rel="stylesheet" href="../../../SEMESTR-1/15-16/css/black.min.css">
+  <link rel="stylesheet" href="../../../SEMESTR-1/15-16/css/monokai.min.css">
+  <style>
+    @keyframes k8s-glow {
+      0%, 100% { text-shadow: 0 0 20px rgba(50,108,229,0.5), 0 0 40px rgba(50,108,229,0.2); }
+      50% { text-shadow: 0 0 30px rgba(50,108,229,0.8), 0 0 60px rgba(0,212,170,0.25); }
+    }
+    @keyframes k8s-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+    html, body, .reveal-viewport, .reveal, .reveal .slides, .reveal .slide-background-content {
+      overflow: hidden !important;
+      scrollbar-width: none !important;
+    }
+    /* Reveal по умолчанию центрирует .slides через translate(-50%, -50%); не убирать Y — иначе контент «падает» вниз */
+    .reveal .slides section.k8s-slide {
+      overflow-y: auto !important;
+      justify-content: center !important;
+      padding-top: 12px !important;
+      padding-bottom: 12px !important;
+    }
+    .reveal .slides {
+      width: 82% !important;
+      height: 92% !important;
+      left: 50% !important;
+      top: 50% !important;
+      transform: translate(-50%, -50%) scale(1.12) !important;
+      transform-origin: center center !important;
+    }
+    .reveal .slides section {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 20px 28px !important;
+      font-size: 0.88em !important;
+      max-width: 100% !important;
+      text-align: center !important;
+      line-height: 1.48 !important;
+    }
+    .reveal h1 {
+      font-size: 1.85em !important;
+      color: #fff !important;
+      animation: k8s-glow 4s ease-in-out infinite !important;
+    }
+    .reveal h2 {
+      font-size: 1.05em !important;
+      color: #7eb8ff !important;
+      border-bottom: 2px solid rgba(50,108,229,0.55) !important;
+      padding-bottom: 0.35em !important;
+      margin-bottom: 0.45em !important;
+      width: 100% !important;
+      text-transform: none !important;
+    }
+    .k8s-title-slide .k8s-title-h1 {
+      font-size: 2.2em !important;
+      background: linear-gradient(90deg, #fff, #7eb8ff, #00d4aa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent !important;
+      animation: k8s-glow 3s ease-in-out infinite !important;
+    }
+    .k8s-title-card {
+      background: rgba(13,17,23,0.75);
+      border: 2px solid rgba(50,108,229,0.6);
+      border-radius: 16px;
+      padding: 36px 48px;
+      max-width: 92%;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
+    }
+    .k8s-helm {
+      font-size: 3.5rem;
+      line-height: 1;
+      margin-bottom: 0.2em;
+      animation: k8s-float 3.5s ease-in-out infinite;
+      filter: drop-shadow(0 0 12px rgba(50,108,229,0.7));
+    }
+    .k8s-title-sub {
+      font-size: 1.15em !important;
+      color: #c9d1d9 !important;
+      margin-top: 0.5em !important;
+    }
+    .k8s-title-meta {
+      color: #8b949e !important;
+      font-size: 0.9em !important;
+      margin-top: 1em !important;
+    }
+    .k8s-slide-inner {
+      width: 100%;
+      max-width: 100%;
+      text-align: left;
+    }
+    .k8s-slide-inner p {
+      margin: 0.35em 0;
+      text-align: left;
+    }
+    .k8s-ul, .k8s-ol {
+      margin: 0.4em auto !important;
+      max-width: 95%;
+      text-align: left !important;
+    }
+    .k8s-ul li {
+      margin-bottom: 0.45em !important;
+      list-style: none !important;
+      position: relative !important;
+      padding-left: 1.1em !important;
+    }
+    .k8s-ul li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: #326CE5;
+      font-weight: bold;
+    }
+    .k8s-ol {
+      list-style: decimal !important;
+      padding-left: 1.6em !important;
+      margin-left: 0.5em !important;
+    }
+    .k8s-ol li {
+      margin-bottom: 0.45em !important;
+      padding-left: 0.15em !important;
+    }
+    .k8s-code {
+      color: #79c0ff !important;
+      background: rgba(110,118,129,0.2) !important;
+      padding: 0.12em 0.35em !important;
+      border-radius: 4px !important;
+      font-size: 0.92em !important;
+    }
+    .k8s-pre {
+      max-width: 100% !important;
+      margin: 10px auto !important;
+      border-radius: 10px !important;
+      border: 1px solid rgba(50,108,229,0.45) !important;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.35) !important;
+      text-align: left !important;
+      font-size: 0.62em !important;
+    }
+    .k8s-pre code {
+      padding: 12px 14px !important;
+      line-height: 1.35 !important;
+      white-space: pre-wrap !important;
+      word-break: break-word !important;
+      max-height: 52vh;
+      overflow-y: auto;
+      display: block;
+    }
+    .mermaid-wrap {
+      max-width: 100%;
+      margin: 8px auto;
+    }
+    .mermaid-wrap--large {
+      max-width: 100%;
+      margin: 12px auto 4px;
+    }
+    .mermaid {
+      background: rgba(22,27,34,0.9) !important;
+      border-radius: 10px !important;
+      padding: 12px !important;
+      border: 1px solid rgba(0,212,170,0.35) !important;
+      text-align: center !important;
+      font-size: 0.55em !important;
+    }
+    .mermaid-wrap--large .mermaid {
+      font-size: 0.92em !important;
+      padding: 18px 14px !important;
+      min-height: 280px;
+    }
+    .mermaid-wrap--large .mermaid svg {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+    .k8s-cluster-wrap {
+      max-width: 100%;
+      margin: 10px auto 6px;
+      overflow: visible !important;
+    }
+    .k8s-cluster-diagram {
+      font-size: clamp(15px, 2.5vmin, 20px) !important;
+      line-height: 1.35 !important;
+      color: #e6edf3 !important;
+      text-align: left !important;
+    }
+    .k8s-cluster-grid {
+      display: grid;
+      grid-template-columns: minmax(200px, 1.15fr) minmax(56px, 0.2fr) minmax(168px, 0.95fr);
+      grid-template-rows: 1fr 1fr;
+      gap: 10px 8px;
+      align-items: stretch;
+    }
+    .k8s-cluster-cp {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      align-self: center;
+    }
+    .k8s-cluster-bridge {
+      grid-column: 2;
+      grid-row: 1 / span 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      padding: 6px 0;
+      min-width: 52px;
+    }
+    .k8s-cluster-bridge-row {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      color: #7ee0c5;
+    }
+    .k8s-cluster-bridge-arrows {
+      font-size: 1.35em;
+      line-height: 1;
+    }
+    .k8s-cluster-bridge-cap {
+      font-size: 0.72em !important;
+      text-align: center;
+      line-height: 1.25;
+      max-width: 4.5em;
+      color: #a8f5e0;
+    }
+    .k8s-cluster-workers {
+      grid-column: 3;
+      grid-row: 1 / span 2;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+    }
+    .k8s-cluster-panel {
+      background: rgba(22,27,34,0.95) !important;
+      border: 2px solid rgba(0,212,170,0.45) !important;
+      border-radius: 12px !important;
+      padding: 12px 14px !important;
+    }
+    .k8s-cluster-panel-title {
+      font-size: 0.78em !important;
+      font-weight: 700 !important;
+      color: #00d4aa !important;
+      margin: 0 0 10px 0 !important;
+      text-transform: none;
+      letter-spacing: 0.02em;
+    }
+    .k8s-cluster-vstack {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .k8s-cluster-block {
+      background: rgba(50,108,229,0.28) !important;
+      border: 1px solid rgba(50,108,229,0.55) !important;
+      border-radius: 8px !important;
+      padding: 10px 12px !important;
+      text-align: center !important;
+      word-break: break-word;
+      hyphens: auto;
+    }
+    .k8s-cluster-block-accent {
+      background: rgba(50,108,229,0.45) !important;
+      border-color: rgba(126,184,255,0.65) !important;
+      font-weight: 600;
+    }
+    .k8s-cluster-etcd {
+      border-style: dashed !important;
+      border-color: rgba(0,212,170,0.5) !important;
+    }
+    .k8s-cluster-sub {
+      display: block;
+      font-size: 0.82em !important;
+      font-weight: 400 !important;
+      color: #8b949e !important;
+      margin-top: 4px;
+    }
+    .k8s-cluster-arr {
+      text-align: center;
+      color: #7eb8ff;
+      font-size: 0.95em;
+      line-height: 1;
+      padding: 2px 0;
+    }
+    .k8s-cluster-hrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .k8s-cluster-arrh {
+      color: #7eb8ff;
+      font-size: 1.1em;
+      flex-shrink: 0;
+    }
+    .k8s-cluster-hrow .k8s-cluster-block {
+      flex: 1;
+    }
+    .k8s-cluster-worker .k8s-cluster-vstack .k8s-cluster-block {
+      padding: 8px 10px !important;
+    }
+    @media (max-width: 900px) {
+      .k8s-cluster-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+      }
+      .k8s-cluster-cp { grid-row: auto; grid-column: 1; }
+      .k8s-cluster-bridge {
+        grid-row: auto;
+        grid-column: 1;
+        flex-direction: row;
+        justify-content: center;
+        gap: 24px;
+      }
+      .k8s-cluster-workers { grid-row: auto; grid-column: 1; }
+    }
+    .k8s-table {
+      font-size: 0.72em !important;
+      margin: 10px auto !important;
+      border-collapse: collapse !important;
+      max-width: 98% !important;
+    }
+    .k8s-table th, .k8s-table td {
+      border: 1px solid rgba(255,255,255,0.2) !important;
+      padding: 8px 10px !important;
+    }
+    .k8s-table th {
+      background: rgba(50,108,229,0.25) !important;
+      color: #7eb8ff !important;
+    }
+    .k8s-quote {
+      background: linear-gradient(90deg, rgba(50,108,229,0.15), transparent);
+      border-left: 4px solid #326CE5;
+      padding: 10px 16px;
+      margin: 8px 0;
+      border-radius: 0 8px 8px 0;
+      text-align: left !important;
+      font-style: italic;
+      color: #e6edf3 !important;
+    }
+    .k8s-lead { color: #00d4aa !important; }
+    .fragment.visible {
+      animation: fragmentFadeIn 0.55s ease-out;
+    }
+    @keyframes fragmentFadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+
+<section data-transition="zoom" data-background-gradient="linear-gradient(135deg,#0d1117 0%,#1e3a5f 40%,#326CE5 100%)" class="k8s-title-slide">
+  <div class="k8s-title-card">
+    <div class="k8s-helm">☸</div>
+    <h1 class="k8s-title-h1">Kubernetes</h1>
+    <p class="k8s-title-sub">Зачем и как он работает — на пальцах</p>
+    <p class="k8s-title-meta fragment">Лекция · 48 слайдов · оркестрация контейнеров</p>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0d1117" class="k8s-slide">
+  <h2>Слайд 0. Мудрость DevOps</h2>
+  <div class="k8s-slide-inner">
+<div class="k8s-quote fragment">🚀 Быстро поднятое — не считается упавшим</div>
+<div class="k8s-quote fragment">🪟 Даже винда стоит на костылях</div>
+<div class="k8s-quote fragment">📊 Не мониторится — значит, работает</div>
+<div class="k8s-quote fragment">🎲 Один раз — не падение, два — не закономерность</div>
+<div class="k8s-quote fragment">🔄 Перезагрузка — это не фикс, это ритуал</div>
+<div class="k8s-quote fragment">📝 Если не логируешь — значит, не было</div>
+<div class="k8s-quote fragment">😅 Нет проблем — нет работы, есть проблемы — нет выходных</div>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#111827" class="k8s-slide">
+  <h2>Слайд 1. Kubernetes: зачем и как он работает</h2>
+  <div class="k8s-slide-inner">
+<p class="fragment"><strong>Простыми словами:</strong> это лекция про «няню для контейнеров» в продакшене — чтобы сервисы сами поднимались, масштабировались и не требовали бегать по серверам с SSH.</p>
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Зачем:</strong> в компаниях контейнеры в проде чаще всего крутят в Kubernetes — полезно понимать базовый смысл, даже если вы не админ кластера</li>
+<li class="fragment fade-in-then-semi-out"><strong>Что разберём на пальцах:</strong> что такое кластер, Pod, Deployment, Service; зачем YAML и команды <code class="k8s-code">kubectl</code></li>
+<li class="fragment fade-in-then-semi-out"><strong>Главная мысль:</strong> ты говоришь кластеру <strong>«как должно быть»</strong> (три копии, такой образ), а он сам думает, <strong>как это сделать</strong> на машинах</li>
+<li class="fragment fade-in-then-semi-out"><strong>После лекции:</strong> сможете своими словами объяснить соседу: зачем API Server, etcd, kubelet и откуда берутся работающие поды</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#0f172a" class="k8s-slide">
+  <h2>Слайд 2. План лекции</h2>
+  <div class="k8s-slide-inner">
+<ol class="k8s-ol">
+<li class="fragment">Что не так, когда всё на одном сервере и Docker «руками»</li>
+<li class="fragment">Что такое Kubernetes и что он <strong>не</strong> волшебная таблетка</li>
+<li class="fragment">Две большие части кластера: <strong>мозги (control plane)</strong> и <strong>рабочие машины (workers)</strong></li>
+<li class="fragment">Сущности «по полочкам»: Pod → Deployment → Service, плюс Ingress, namespace, ConfigMap</li>
+<li class="fragment">Как люди реально работают: файлы YAML, <code class="k8s-code">kubectl</code>, почему не лезут на ноды по SSH</li>
+<li class="fragment">Где K8s уместен, где избыточен; базы данных внутри кластера — отдельная история</li>
+</ol>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#1e1b4b" class="k8s-slide">
+  <h2>Слайд 3. Мир без Kubernetes</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Один сервер</strong> — как один розетка на всю квартиру: вырубилось — всё погасло</li>
+<li class="fragment fade-in-then-semi-out"><strong>Ручной деплой</strong> — залил файлы по SSH, поправил конфиг руками, перезапустил сервис; завтра другой человек — другая «магия»</li>
+<li class="fragment fade-in-then-semi-out"><strong>Упал процесс</strong> — пока никто не заметил в чате, пользователи видят ошибку</li>
+<li class="fragment fade-in-then-semi-out"><strong>Одна точка отказа (SPOF)</strong> — сломалось железо или ОС → лежит всё приложение целиком</li>
+<li class="fragment fade-in-then-semi-out"><strong>Хочешь два сервера под нагрузку</strong> — по сути дублируешь всю ручную схему ещё раз</li>
+</ul>
+<p class="fragment"><strong class="k8s-lead">Картинка в голове:</strong></p>
+<pre class="k8s-pre fragment"><code class="hljs language-plaintext">                    [ Пользователи ]
+                            │
+                            ▼
+                    ┌───────────────┐
+                    │  Один сервер  │  ← если он лёг — конец
+                    │  приложение   │
+                    └───────────────┘</code></pre>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0c4a6e" class="k8s-slide">
+  <h2>Слайд 4. Контейнеры — шаг вперёд</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Docker</strong> (и похожие штуки) — это «коробка» с приложением и всеми библиотеками внутри: перенёс коробку — везде одинаково</li>
+<li class="fragment fade-in-then-semi-out"><strong>На ноуте и на сервере</strong> меньше фразы «у меня работало»: окружение в образе одно и то же</li>
+<li class="fragment fade-in-then-semi-out"><strong>Запуск быстрее</strong>, чем поднимать тяжёлую виртуалку на каждый сервис</li>
+<li class="fragment fade-in-then-semi-out"><strong>Но коробка сама по себе</strong> не чинит падения, не размножается на пять машин и не настраивает сеть между десятками копий — для этого нужен следующий уровень</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#134e4a" class="k8s-slide">
+  <h2>Слайд 5. Проблемы Docker без оркестрации</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Контейнер упал</strong> — кто его поднимет? Написали скрипт? Повесили на systemd? Легко забыть или сделать по-разному на разных серверах</li>
+<li class="fragment fade-in-then-semi-out"><strong>Умер целый сервер</strong> — все контейнеры на нём пропали; IP и балансировку кто-то должен руками перекинуть</li>
+<li class="fragment fade-in-then-semi-out"><strong>Нагрузка выросла</strong> — не нажмёшь кнопку «дай ещё пять копий» без своей автоматики</li>
+<li class="fragment fade-in-then-semi-out"><strong>Обновление версии</strong> часто выглядит так: остановил старый контейнер → <strong>простой</strong> → поднял новый</li>
+<li class="fragment fade-in-then-semi-out">Много серверов + много контейнеров без общей системы = <strong>вечные ночные звонки и хаос</strong></li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#0d1117" class="k8s-slide">
+  <h2>Слайд 6. Нужна оркестрация</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Оркестратор</strong> — как дирижёр: не ты бегаешь по музыкантам, а ты показал партитуру, остальное согласовано</li>
+<li class="fragment fade-in-then-semi-out"><strong>Автоматизация:</strong> «хочу три копии» — система сама следит, чтобы их реально было три</li>
+<li class="fragment fade-in-then-semi-out"><strong>Если что-то упало</strong> — перезапустить или пересоздать по правилам, а не ждать, пока человек проснётся</li>
+<li class="fragment fade-in-then-semi-out"><strong>Масштаб:</strong> увеличил число в конфиге — появились новые поды (если хватает железа)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Обновления</strong> можно делать по очереди (rolling), чтобы не гасить всё разом</li>
+<li class="fragment fade-in-then-semi-out">Одной фразой: <strong>планировщик + постоянная проверка «как задумано» vs «как на самом деле»</strong></li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#111827" class="k8s-slide">
+  <h2>Слайд 7. Что такое Kubernetes</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Kubernetes (K8s)</strong> — программа, которая <strong>разводит контейнеры по серверам</strong> и <strong>держит заданное количество</strong> копий</li>
+<li class="fragment fade-in-then-semi-out"><strong>Кластер</strong> — несколько машин, которые для тебя выглядят как <strong>одна площадка</strong>: «запусти мне сервис», а не «зайди на сервер №3»</li>
+<li class="fragment fade-in-then-semi-out"><strong>Ты задаёшь цель:</strong> например, «всегда работают три пода с таким образом» — K8s <strong>не отвлекается</strong> и к этому стремится</li>
+<li class="fragment fade-in-then-semi-out"><strong>Сеть и диски</strong> «из коробки» бывают по-разному: часто ставят <strong>плагины</strong> (сеть CNI, диски CSI, вход Ingress) — это нормально, не всё вшито внутрь</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#0f172a" class="k8s-slide">
+  <h2>Слайд 8. Kubernetes простыми словами</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out">Ты пишешь <strong>«что нужно»:</strong> сколько копий, какой образ, какие порты, переменные окружения</li>
+<li class="fragment fade-in-then-semi-out">K8s думает <strong>«как сделать»:</strong> на какой машине что посадить, кого пересоздать, если умерло</li>
+<li class="fragment fade-in-then-semi-out">Внутри крутится <strong>бесконечный цикл проверки:</strong> «в базе записано одно, на нодах другое» → поправить</li>
+<li class="fragment fade-in-then-semi-out"><strong>Аналогия:</strong> не «зайди на сервер и набери команды», а <strong>«вот договор — держи кластер в соответствии с ним»</strong>; как автопилот, который постоянно подруливает</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#1e1b4b" class="k8s-slide">
+  <h2>Слайд 9. Что Kubernetes делает</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Запускает</strong> твои контейнеры в обёртке <strong>Pod</strong> на рабочих нодах</li>
+<li class="fragment fade-in-then-semi-out"><strong>Поднимает заново</strong>, если процесс внутри пода умер (по правилам, которые ты задал)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Делает больше или меньше копий</strong>, когда меняешь число реплик (а авто-масштаб по CPU — отдельная тема про HPA)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Обновляет версию</strong> постепенно: старые поды меняются на новые не обязательно разом (<strong>rolling</strong>), можно <strong>откатиться</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>Про «без простоя»:</strong> само по себе K8s не гарантирует идеал — нужно, чтобы приложение <strong>корректно стартовало и завершалось</strong>, были <strong>пробы готовности</strong>, и <strong>не одна копия</strong> на весь мир</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0c4a6e" class="k8s-slide">
+  <h2>Слайд 10. Что Kubernetes не делает</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Не пишет код за тебя</strong> и <strong>не собирает образы</strong> — сборка в CI, образ лежит в <strong>registry</strong> (как склад контейнеров)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Не чинит логические баги:</strong> приложение падает в цикле — K8s может только <strong>тупо перезапускать</strong>, причина всё равно в коде или конфиге</li>
+<li class="fragment fade-in-then-semi-out"><strong>Не ускоряет тормоза:</strong> добавил пять копий — просто <strong>пять одинаково медленных</strong> экземпляров</li>
+<li class="fragment fade-in-then-semi-out"><strong>Не заменяет глаза:</strong> логи, метрики, алерты — ставят <strong>отдельно</strong> (это другой слой)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Не делает базу «самосейф»:</strong> диски, бэкапы, репликация БД — всё равно нужно <strong>проектировать</strong></li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#134e4a" class="k8s-slide">
+  <h2>Слайд 11. Kubernetes — это кластер</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Несколько машин (нод):</strong> условно «мозги» (control plane) и «рабочие» (workers); в миникубе на ноуте всё может быть <strong>на одной машине</strong> — для учёбы ок, для настоящего прода так обычно не проектируют</li>
+<li class="fragment fade-in-then-semi-out">Ты общаешься с кластером <strong>через один API</strong>, а не логинишься в каждую ВМ по очереди</li>
+<li class="fragment fade-in-then-semi-out"><strong>Один язык описания:</strong> Pod, Service, Deployment — одни и те же сущности для всего кластера</li>
+<li class="fragment fade-in-then-semi-out">Машин может быть <strong>две или двести</strong> — идея та же, меняется только то, как это <strong>эксплуатируют</strong> люди</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#0d1117" class="k8s-slide">
+  <h2>Слайд 12. Компоненты кластера</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Control plane (пульт управления)</strong> — решает *что где должно быть*, хранит настройки; <strong>обычно</strong> сюда не суют ваши бизнес-приложения как на проде</li>
+<li class="fragment fade-in-then-semi-out"><strong>Worker nodes (рабочие)</strong> — здесь <strong>реально крутятся</strong> ваши поды: на каждой ноде свой агент <strong>kubelet</strong> и движок контейнеров</li>
+</ul>
+<p class="fragment"><strong>Схема «кто где живёт»</strong> (HTML в презентации — подписи не режутся, в отличие от Mermaid в Reveal)</p>
+<div class="k8s-cluster-wrap fragment"><div class="k8s-cluster-diagram" role="img" aria-label="Схема: Control Plane и рабочие ноды Kubernetes">
+  <div class="k8s-cluster-grid">
+    <div class="k8s-cluster-cp k8s-cluster-panel">
+      <div class="k8s-cluster-panel-title">Пульт: Control Plane</div>
+      <div class="k8s-cluster-vstack">
+        <div class="k8s-cluster-block">Планировщик + контроллеры<br><span class="k8s-cluster-sub">scheduler, controller-manager</span></div>
+        <div class="k8s-cluster-arr">↓</div>
+        <div class="k8s-cluster-block">kubectl / CI</div>
+        <div class="k8s-cluster-arr">↓</div>
+        <div class="k8s-cluster-block k8s-cluster-block-accent">API Server<br><span class="k8s-cluster-sub">kube-apiserver</span></div>
+        <div class="k8s-cluster-hrow">
+          <span class="k8s-cluster-arrh">↔</span>
+          <div class="k8s-cluster-block k8s-cluster-etcd">etcd<br><span class="k8s-cluster-sub">память кластера</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="k8s-cluster-bridge">
+      <div class="k8s-cluster-bridge-row">
+        <span class="k8s-cluster-bridge-arrows">⇄</span>
+        <div class="k8s-cluster-bridge-cap">watch,<br>команды</div>
+      </div>
+      <div class="k8s-cluster-bridge-row">
+        <span class="k8s-cluster-bridge-arrows">⇄</span>
+        <div class="k8s-cluster-bridge-cap">watch,<br>команды</div>
+      </div>
+    </div>
+    <div class="k8s-cluster-workers">
+      <div class="k8s-cluster-panel k8s-cluster-worker">
+        <div class="k8s-cluster-panel-title">Рабочая нода</div>
+        <div class="k8s-cluster-vstack">
+          <div class="k8s-cluster-block">kubelet</div>
+          <div class="k8s-cluster-arr">↓</div>
+          <div class="k8s-cluster-block">движок контейнеров</div>
+          <div class="k8s-cluster-arr">↓</div>
+          <div class="k8s-cluster-block">ваши Pod</div>
+        </div>
+      </div>
+      <div class="k8s-cluster-panel k8s-cluster-worker">
+        <div class="k8s-cluster-panel-title">Рабочая нода …</div>
+        <div class="k8s-cluster-vstack">
+          <div class="k8s-cluster-block">kubelet</div>
+          <div class="k8s-cluster-arr">↓</div>
+          <div class="k8s-cluster-block">Pod …</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></div>
+<p class="fragment"><strong>Упрощение для слайда:</strong> <strong>kube-proxy</strong> на ноде не показан — он участвует в сети Service; здесь акцент на связи <strong>API Server ↔ kubelet</strong> и на цепочке <strong>kubelet → движок → Pod</strong>.</p>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#111827" class="k8s-slide">
+  <h2>Слайд 13. Control Plane</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out">Это <strong>центр принятия решений:</strong> почти всё, что меняет кластер, проходит <strong>через API</strong>, а не «тихо на диске одной ноды»</li>
+<li class="fragment fade-in-then-semi-out"><strong>Куда посадить новый под</strong> решает scheduler; <strong>сколько подов держать</strong> подгоняют контроллеры под то, что записано в Deployment и т.д.</li>
+<li class="fragment fade-in-then-semi-out"><strong>Память кластера</strong> — <strong>etcd</strong>: там лежит «как должно быть» (в удобном для машин виде)</li>
+<li class="fragment fade-in-then-semi-out">Если <strong>пульт сломался</strong>, новые деплои сделать трудно; <strong>уже запущенные</strong> поды могут ещё какое-то время пожить сами по себе — но это не повод расслабляться</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0f172a" class="k8s-slide">
+  <h2>Слайд 14. API Server (kube-apiserver)</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Единая дверь</strong> в управление кластером: и <code class="k8s-code">kubectl</code>, и внутренние компоненты стучатся сюда</li>
+<li class="fragment fade-in-then-semi-out">Любая твоя команда <strong>apply / get / delete</strong> — по сути <strong>запрос к API</strong> (как к сайту, только для инфраструктуры)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Проверки:</strong> объект похож на правду? <strong>Кто ты?</strong> (логин) <strong>Тебе можно?</strong> (права, RBAC) <strong>Не нарушаешь ли политики?</strong> (admission — как охрана на входе)</li>
+<li class="fragment fade-in-then-semi-out">В нормальной схеме в etcd <strong>пишут через этот сервер</strong>, а не «в обход», как в банке через кассира, а не через черный ход</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#1e1b4b" class="k8s-slide">
+  <h2>Слайд 15. Scheduler (kube-scheduler)</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Задача простая словами:</strong> новый под появился — <strong>на какую из рабочих нод его посадить?</strong></li>
+<li class="fragment fade-in-then-semi-out">Смотрит на <strong>сколько CPU/RAM просит под</strong>, на <strong>метки и ограничения</strong> нод (в духе «только на ноды с SSD» или «не на этот сервер»)</li>
+<li class="fragment fade-in-then-semi-out">Сначала <strong>отсекает</strong> неподходящие машины, потом <strong>выбирает лучшую</strong> из оставшихся по своим правилам</li>
+<li class="fragment fade-in-then-semi-out"><strong>Сам контейнер не запускает</strong> — только <strong>ставит штамп «этот под — на ноду X»</strong>; дальше работает <strong>kubelet</strong> на той ноде</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#0c4a6e" class="k8s-slide">
+  <h2>Слайд 16. Controller Manager</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Постоянно сравнивает:</strong> «в etcd написано, что должно быть» и «что реально есть»</li>
+<li class="fragment fade-in-then-semi-out"><strong>Пример на пальцах:</strong> должно быть 3 пода, живёт 2 → <strong>доложит третий</strong>; живёт лишний → <strong>уберёт</strong></li>
+<li class="fragment fade-in-then-semi-out">Внутри куча маленьких <strong>контроллеров</strong> под разные вещи (Deployment, Job, ноды…)</li>
+<li class="fragment fade-in-then-semi-out">Можно запомнить фразу: <strong>смотри → не совпало → подправь</strong> (и так по кругу)</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#134e4a" class="k8s-slide">
+  <h2>Слайд 17. etcd</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>База настроек кластера:</strong> что за деплойменты, сервисы, сколько реплик — всё это <strong>лежит здесь</strong> (через API Server)</li>
+<li class="fragment fade-in-then-semi-out">Если спросить «<strong>что кластер обещает держать?</strong>» — ответ смотрят <strong>в etcd</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>Сломался или рассинхронился etcd</strong> — как потерять <strong>главную таблицу учёта</strong>: кластером тяжело управлять</li>
+<li class="fragment fade-in-then-semi-out">В проде <strong>бэкапы etcd</strong> — не «для гиков», а <strong>страховка</strong>, как копия важного документа</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#0d1117" class="k8s-slide">
+  <h2>Слайд 18. Worker Node</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Здесь бежит ваш код</strong> в подах, которые на эту ноду назначили</li>
+<li class="fragment fade-in-then-semi-out"><strong>Железо и ресурсы</strong> (процессор, память, диск) тратятся <strong>здесь</strong> — графики нагрузки смотрят по нодам и подам</li>
+<li class="fragment fade-in-then-semi-out">На ноде всегда есть <strong>kubelet</strong> (агент), <strong>движок контейнеров</strong>, <strong>kube-proxy</strong> (про сеть сервисов)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Руками править контейнеры на сервере</strong> — плохая идея: K8s потом <strong>перезатрёт</strong> или получится <strong>каша</strong> «как в конфиге» vs «как я ночью починил»</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#111827" class="k8s-slide">
+  <h2>Слайд 19. kubelet</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Сторож этой конкретной ноды:</strong> «я жива, вот мои поды в таком состоянии»</li>
+<li class="fragment fade-in-then-semi-out"><strong>Слушает API Server:</strong> ему говорят, <strong>какие поды</strong> на этой ноде должны жить; он <strong>отчитывается</strong>, получилось или нет</li>
+<li class="fragment fade-in-then-semi-out"><strong>Реально создаёт под:</strong> тома, запуск контейнера через движок (CRI)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Пробы (probes):</strong> периодически <strong>стучится</strong> в приложение по HTTP или команде — «жив ли? готов ли принимать трафик?»</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0f172a" class="k8s-slide">
+  <h2>Слайд 20. Container runtime (CRI)</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>kubelet не общается с Docker «напрямую по-старому»</strong> — только через стандарт <strong>CRI</strong> (интерфейс «запусти контейнер»)</li>
+<li class="fragment fade-in-then-semi-out">На ноде чаще стоят <strong>containerd</strong> или <strong>CRI-O</strong> — это нормально; <strong>Docker</strong> часто остаётся инструментом <strong>сборки</strong> образа на ноуте или в CI</li>
+<li class="fragment fade-in-then-semi-out">Образ <strong>собрали</strong> → <strong>залили в registry</strong> → в манифесте указали <strong>откуда тянуть</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>Pod</strong> внизу — это что-то вроде <strong>общей «комнаты»</strong> для контейнеров: общая сеть, можно общий диск</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#1e1b4b" class="k8s-slide">
+  <h2>Слайд 21. Kube-proxy</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Service</strong> внутри кластера — это не магия: на каждой ноде <strong>kube-proxy</strong> настраивает правила так, чтобы запрос на «виртуальный адрес сервиса» <strong>дошёл до живых подов</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>Размазывает нагрузку</strong> между подами, которые <strong>готовы</strong> принимать трафик</li>
+<li class="fragment fade-in-then-semi-out"><strong>Не путать:</strong> kube-proxy — про <strong>достучаться до сервиса</strong> (как до стойки внутри здания); <strong>Ingress</strong> — про <strong>вход с улицы по HTTP</strong> (домен, путь, HTTPS)</li>
+<li class="fragment fade-in-then-semi-out">Поды переехали или пересоздались — правила <strong>обновятся</strong>, чтобы сервис не смотрел в пустоту</li>
+</ul>
+<p class="fragment"><strong class="k8s-lead">Цепочка «с улицы до пода»</strong></p>
+<div class="mermaid-wrap fragment"><div class="mermaid">flowchart LR
+  EXT[Пользователь снаружи]
+  ING[Ingress вход по HTTP]
+  SVC[Service внутри кластера]
+  P1[Pod]
+  P2[Pod]
+  P3[Pod]
+
+  EXT --&gt; ING
+  ING --&gt; SVC
+  SVC --&gt; P1
+  SVC --&gt; P2
+  SVC --&gt; P3</div></div>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#0c4a6e" class="k8s-slide">
+  <h2>Слайд 22. Главная идея Kubernetes</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Desired state</strong> — «как <strong>должно</strong> быть» по документам в кластере</li>
+<li class="fragment fade-in-then-semi-out"><strong>Факт</strong> — «что <strong>есть</strong> сейчас на машинах»</li>
+<li class="fragment fade-in-then-semi-out">K8s <strong>всё время подтягивает факт к договору</strong>: создаёт, удаляет, перезапускает</li>
+<li class="fragment fade-in-then-semi-out">Ты поменял манифест или нажал apply — дальше <strong>роботы</strong> доводят систему до нового «должно»</li>
+</ul>
+<p class="fragment"><strong class="k8s-lead">Петля «подогнать реальность под задумку»</strong></p>
+<div class="mermaid-wrap fragment"><div class="mermaid">flowchart LR
+  A[Файл YAML / kubectl apply] --&gt; B[API Server]
+  B --&gt; C[(etcd)]
+  D[Контроллеры] --&gt; B
+  D --&gt; E{Сошлось?}
+  E --&gt;|нет| F[Создать/убрать/обновить поды...]
+  F --&gt; G[kubelet + движок]
+  E --&gt;|да| D</div></div>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#134e4a" class="k8s-slide">
+  <h2>Слайд 23. Декларативный подход</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out">Ты описываешь <strong>результат:</strong> «вот такое приложение, столько копий»</li>
+<li class="fragment fade-in-then-semi-out">Ты <strong>не пишешь сценарий</strong> «зайди на сервер А, выполни 20 команд, потом на Б…»</li>
+<li class="fragment fade-in-then-semi-out">Удобно хранить описание в <strong>Git</strong> — видно <strong>кто и что поменял</strong>, можно откатить</li>
+<li class="fragment fade-in-then-semi-out">Быстрые команды в консоли (<code class="k8s-code">kubectl run</code> и т.д.) для эксперимента — ок; в проде чаще <strong>файлы в репозитории</strong> или шаблоны (Helm, Kustomize)</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0d1117" class="k8s-slide">
+  <h2>Слайд 24. Пример Desired State</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out">Говоришь: <strong>«Держи три копии</strong> приложения с образа <code class="k8s-code">myapp:1.2.3</code>»</li>
+<li class="fragment fade-in-then-semi-out">Один под <strong>снёсся</strong> — система <strong>создаст новый</strong>, чтобы снова было три</li>
+<li class="fragment fade-in-then-semi-out">Поставил <strong>пять</strong> — будет <strong>пять</strong> (если хватает ресурсов)</li>
+<li class="fragment fade-in-then-semi-out">Поменял образ на <strong>новую версию</strong> — старые поды <strong>по очереди</strong> заменятся на новые (как настроишь в Deployment)</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#111827" class="k8s-slide">
+  <h2>Слайд 25. Pod</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Pod</strong> — минимальная «порция», которую <strong>планируют на ноду</strong> целиком (не «полконтейнера»)</li>
+<li class="fragment fade-in-then-semi-out">Внутри пода может быть <strong>один контейнер</strong> или <strong>несколько</strong> — они <strong>делят сеть</strong> (друг к другу как <code class="k8s-code">localhost</code>) и могут <strong>делить диск</strong></li>
+<li class="fragment fade-in-then-semi-out">Частый пример: <strong>основной сервис</strong> + <strong>помощник сбоку</strong> (логи, прокси) — <strong>sidecar</strong></li>
+<li class="fragment fade-in-then-semi-out">У пода <strong>нет вечного IP</strong>; если нужен <strong>стабильный вход</strong> — вешают <strong>Service</strong></li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#0f172a" class="k8s-slide">
+  <h2>Слайд 26. Pod ≠ контейнер</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Под живёт недолго по смыслу:</strong> деплой, нехватка места, смерть ноды — под <strong>пересоздали</strong>, это нормально</li>
+<li class="fragment fade-in-then-semi-out"><strong>Контейнеры внутри</strong> — как соседи в одной квартире: сеть общая</li>
+<li class="fragment fade-in-then-semi-out"><strong>Вручную Pod для сайта</strong> обычно <strong>не клепают</strong> — ими рулит <strong>Deployment</strong> (или Job, StatefulSet — по задаче)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Зачем несколько контейнеров в одном поде?</strong> Когда им <strong>очень нужно</strong> быть рядом: общий том, localhost, один жизненный цикл</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#1e1b4b" class="k8s-slide">
+  <h2>Слайд 27. Deployment</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Deployment</strong> — удобная кнопка «<strong>держи N копий</strong> этого приложения и <strong>обновляй аккуратно</strong>»</li>
+<li class="fragment fade-in-then-semi-out">Внутри у него есть <strong>ReplicaSet</strong> (сколько подов из одного шаблона); <strong>вручную ReplicaSet</strong> в обычной жизни не трогают</li>
+<li class="fragment fade-in-then-semi-out"><strong>replicas</strong> в YAML — сколько копий</li>
+<li class="fragment fade-in-then-semi-out"><strong>Стратегия обновления:</strong> по очереди (<strong>RollingUpdate</strong>) или <strong>всех убить и поднять заново</strong> (<strong>Recreate</strong>) — как выберешь</li>
+<li class="fragment fade-in-then-semi-out">Можно <strong>откатиться</strong> на прошлую версию, если новая вела себя плохо</li>
+</ul>
+<p class="fragment"><strong class="k8s-lead">Кто кого держит</strong></p>
+<div class="mermaid-wrap fragment"><div class="mermaid">flowchart TB
+  DEP[Deployment]
+  RS[ReplicaSet]
+  P1[Pod 1]
+  P2[Pod 2]
+  P3[Pod 3]
+
+  DEP --&gt; RS
+  RS --&gt; P1
+  RS --&gt; P2
+  RS --&gt; P3</div></div>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#0c4a6e" class="k8s-slide">
+  <h2>Слайд 28. Зачем Deployment</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Сам себя чинит:</strong> под пропал — <strong>новый поднимется</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>Выкат по-живому:</strong> новая версия <strong>подтекает</strong> постепенно; <strong>откат</strong> — вернуться назад</li>
+<li class="fragment fade-in-then-semi-out"><strong>Один файл — одна правда:</strong> не надо помнить, что «на сервере 7 мы забыли обновить»</li>
+<li class="fragment fade-in-then-semi-out">Если нужны <strong>стабильные имена</strong> и <strong>свой диск на каждую реплику</strong> (как у баз) — смотрят <strong>StatefulSet</strong>, это другая история</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#134e4a" class="k8s-slide">
+  <h2>Слайд 29. Service</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Service</strong> — <strong>постоянная вывеска</strong> на группу подов: пользователи стучатся <strong>в вывеску</strong>, а не в «телефон каждого пода отдельно»</li>
+<li class="fragment fade-in-then-semi-out">Типы на пальцах: <strong>внутри кластера</strong> (ClusterIP), <strong>наружу через порт ноды</strong> (NodePort), <strong>балансировщик в облаке</strong> (LoadBalancer) — зависит от облака и настроек</li>
+<li class="fragment fade-in-then-semi-out"><strong>DNS-имя</strong> сервиса <strong>не прыгает</strong>, когда поды пересоздали</li>
+<li class="fragment fade-in-then-semi-out"><strong>Ingress</strong> — отдельная штука + <strong>программа-контроллер</strong> (nginx, traefik…): <strong>по какому адресу и пути</strong> направить трафик на какой Service</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0d1117" class="k8s-slide">
+  <h2>Слайд 30. Зачем Service</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Поды как одноразовые котята:</strong> IP сменился, под другой — <strong>не надо</strong> переписывать клиентов</li>
+<li class="fragment fade-in-then-semi-out"><strong>Service стоит на месте:</strong> тот же <strong>логический адрес</strong> внутри кластера</li>
+<li class="fragment fade-in-then-semi-out"><strong>Метки (labels)</strong> — как <strong>бирки</strong> на подах; Service говорит: «мне все с биркой <code class="k8s-code">app: shop</code>»</li>
+<li class="fragment fade-in-then-semi-out">Без сервиса пришлось бы <strong>самим лезть в API</strong> и узнавать, куда стучаться — <strong>ломко и ненадёжно</strong></li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#111827" class="k8s-slide">
+  <h2>Слайд 31. YAML в Kubernetes</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>YAML-файл</strong> — это <strong>заявление</strong> в кластер: какой объект, как его зовут, что внутри (<strong>spec</strong>)</li>
+<li class="fragment fade-in-then-semi-out">Кластер <strong>либо принимает</strong>, либо <strong>ругается</strong> — как форма с обязательными полями</li>
+<li class="fragment fade-in-then-semi-out"><strong>Namespace</strong> — как <strong>папка</strong> или <strong>квартира в доме</strong>: одни и те же имена в разных namespace не конфликтуют</li>
+<li class="fragment fade-in-then-semi-out"><strong>ConfigMap</strong> — настройки <strong>не секретные</strong>; <strong>Secret</strong> — пароли и ключи (всё равно хранить аккуратно, это не абсолютная магия)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Хорошая привычка:</strong> манифесты в <strong>Git</strong>, деплой из пайплайна или GitOps</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#0f172a" class="k8s-slide">
+  <h2>Слайд 32. Пример YAML (идея)</h2>
+  <div class="k8s-slide-inner">
+<p class="fragment"><strong>Не полный прод-манифест</strong>, а «как это вообще выглядит глазами»:</p>
+<pre class="k8s-pre fragment"><code class="hljs language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-demo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-demo
+  template:
+    metadata:
+      labels:
+        app: nginx-demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25
+          ports:
+            - containerPort: 80</code></pre>
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>replicas: 3</strong> — «хочу <strong>три</strong> одинаковых пода»</li>
+<li class="fragment fade-in-then-semi-out"><strong>image</strong> — <strong>какой образ</strong> скачать из registry</li>
+<li class="fragment fade-in-then-semi-out">Рядом обычно кладут <strong>Service</strong> с тем же <strong><code class="k8s-code">app: nginx-demo</code></strong>, чтобы к ним <strong>стучались по имени</strong>, а не по IP пода</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#1e1b4b" class="k8s-slide">
+  <h2>Слайд 33. Как работают с Kubernetes</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>kubectl</strong> — твоя <strong>консоль к кластеру</strong>; в файле <strong>kubeconfig</strong> лежит «куда подключаться»</li>
+<li class="fragment fade-in-then-semi-out"><strong>kubectl apply -f папка/</strong> — «<strong>примени</strong> всё, что в файлах»</li>
+<li class="fragment fade-in-then-semi-out"><strong>Lens, k9s, веб-дашборд</strong> — удобно <strong>смотреть</strong>; без понимания API это <strong>как GPS без карты в голове</strong></li>
+<li class="fragment fade-in-then-semi-out">В зрелых командах часто <strong>GitOps</strong>: в Git поменяли — <strong>агент сам</strong> подтянул в кластер</li>
+</ul>
+<p class="fragment"><strong class="k8s-lead">Один apply — что происходит под капотом</strong></p>
+<div class="mermaid-wrap fragment"><div class="mermaid">sequenceDiagram
+  participant Op as Человек / CI
+  participant K as kubectl
+  participant API as kube-apiserver
+  participant ET as etcd
+
+  Op-&gt;&gt;K: apply -f deployment.yaml
+  K-&gt;&gt;API: отправить Deployment
+  API-&gt;&gt;ET: записать «как должно быть»
+  API--&gt;&gt;K: ок или текст ошибки</div></div>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0c4a6e" class="k8s-slide">
+  <h2>Слайд 34. Основные команды</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong><code class="k8s-code">kubectl apply -f ...</code></strong> — <strong>внедрить</strong> конфиг; <strong><code class="k8s-code">delete</code></strong> — <strong>убрать</strong> по файлу</li>
+<li class="fragment fade-in-then-semi-out"><strong><code class="k8s-code">kubectl get …</code></strong> — <strong>список</strong>; <strong><code class="k8s-code">describe</code></strong> — <strong>подробности</strong>, почему не стартует</li>
+<li class="fragment fade-in-then-semi-out"><strong><code class="k8s-code">kubectl logs</code></strong> — <strong>логи</strong> пода; <strong><code class="k8s-code">exec</code></strong> — зайти <strong>внутрь</strong> как в контейнер (для отладки, не как основной способ жизни)</li>
+<li class="fragment fade-in-then-semi-out"><strong><code class="k8s-code">rollout status</code> / <code class="k8s-code">rollout undo</code></strong> — <strong>докатилось ли</strong> обновление и <strong>откатить</strong> деплоймент</li>
+<li class="fragment fade-in-then-semi-out"><strong><code class="k8s-code">port-forward</code></strong> — <strong>пробросить</strong> порт сервиса на свой ноут (<strong>удобно потыкать</strong> сервис изнутри кластера)</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#134e4a" class="k8s-slide">
+  <h2>Слайд 35. Важное правило</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Не лечить прод через SSH на ноду</strong>, меняя контейнеры руками — завтра <strong>никто не воспроизведёт</strong>, что ты сделал</li>
+<li class="fragment fade-in-then-semi-out"><strong>Не убивать/поднимать docker на сервере мимо K8s</strong> — кластер <strong>вернёт своё</strong> из «правды» в etcd, а ты запутаешься</li>
+<li class="fragment fade-in-then-semi-out"><strong>Исключение:</strong> когда <strong>падает сама нода</strong> или сеть — это уже <strong>зона админов</strong>, не ежедневная работа разработчика</li>
+<li class="fragment fade-in-then-semi-out">Всё важное — <strong>в манифестах и в Git</strong>, а не «я помню, как в прошлый раз на сервере 5 крутил»</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#0d1117" class="k8s-slide">
+  <h2>Слайд 36. Где используют Kubernetes</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Бэкенды и микросервисы</strong> — каждый сервис <strong>своим</strong> деплойментом, команды <strong>разводят по namespace</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>CI/CD:</strong> собрали образ → <strong>обновили тег</strong> в манифесте или <strong>пнули</strong> GitOps — выкат пошёл</li>
+<li class="fragment fade-in-then-semi-out">Большие компании дают разработчикам <strong>«внутренний хостинг»</strong> поверх K8s: лимиты, шаблоны, готовые ingress</li>
+<li class="fragment fade-in-then-semi-out">Один и тот же <strong>стиль описания</strong> приложения — <strong>разные кластеры</strong> (тест / прод / облако) — ментально проще, чем <strong>семь уникальных</strong> способов деплоя</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#111827" class="k8s-slide">
+  <h2>Слайд 37. Kubernetes и базы данных</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>База — не как веб-сервер:</strong> ей нужен <strong>диск</strong>, порядок, иногда <strong>имя</strong>, которое не прыгает → чаще <strong>StatefulSet</strong>, <strong>тома (PVC)</strong>, иногда <strong>оператор</strong> (готовый «пакет знаний» про эту БД)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Оператор</strong> — как <strong>автоматический админ</strong> для конкретного продукта, но <strong>волшебства без мозгов</strong> не бывает</li>
+<li class="fragment fade-in-then-semi-out">Частый выбор: <strong>managed БД в облаке</strong> (RDS и т.п.) <strong>рядом</strong> с кластером — меньше ночных тревог</li>
+<li class="fragment fade-in-then-semi-out"><strong>Не класть PostgreSQL как обычный сайт</strong> одним Deployment <strong>без думания про данные</strong> — это путь к <strong>слезам и потере данных</strong></li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#0f172a" class="k8s-slide">
+  <h2>Слайд 38. Честно о Kubernetes</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Учить долго:</strong> много слоёв — сеть, диски, права, обновления <strong>самого</strong> кластера</li>
+<li class="fragment fade-in-then-semi-out"><strong>Не каждому стартапу нужен:</strong> один сервис на одной ВМ или готовый <strong>PaaS</strong> иногда <strong>дешевле по голове</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>Деньги и люди:</strong> либо <strong>свои админы</strong>, либо <strong>managed</strong> Kubernetes в облаке + мониторинг</li>
+<li class="fragment fade-in-then-semi-out"><strong>Окупается</strong>, когда сервисов <strong>много</strong>, релизы <strong>частые</strong>, команда <strong>больше одного человека</strong> и нужна <strong>предсказуемая</strong> инфраструктура</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#1e1b4b" class="k8s-slide">
+  <h2>Слайд 39. Когда Kubernetes нужен</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Много сервисов и копий</strong> — руками <strong>не разрулить</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>Нужна живучесть:</strong> упала машина — <strong>остальные</strong> продолжают, поды <strong>переедут</strong> (в рамках настроек)</li>
+<li class="fragment fade-in-then-semi-out"><strong>Хочется одного способа</strong> деплоя и масштаба для <strong>всех</strong> команд</li>
+<li class="fragment fade-in-then-semi-out"><strong>Когда можно подождать с K8s:</strong> один монолит, один инстанс, <strong>никто</strong> не будет кластером заниматься — может, хватит <strong>простого</strong> хостинга или Docker Compose на одной машине</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0c4a6e" class="k8s-slide">
+  <h2>Слайд 40. Итог лекции</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Kubernetes</strong> — это <strong>постоянная подгонка</strong> «как на самом деле» под «как задумано», с <strong>записью правды</strong> в etcd и <strong>агентами</strong> на нодах</li>
+<li class="fragment fade-in-then-semi-out"><strong>Цепочка на пальцах:</strong> <strong>Pod</strong> (контейнеры) ← <strong>Deployment</strong> (сколько и как обновлять) ← <strong>Service</strong> (стабильный вход) ← при необходимости <strong>Ingress</strong> (HTTP с улицы)</li>
+<li class="fragment fade-in-then-semi-out">Дальше в жизни встретите <strong>сеть, диски, безопасность, логи</strong> — но <strong>каркас</strong> вы уже знаете</li>
+<li class="fragment fade-in-then-semi-out"><strong>Практика:</strong> minikube / kind / k3d / k3s, свои YAML, потом Helm или Kustomize — <strong>руками один раз</strong> пройти бесценно</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#134e4a" class="k8s-slide">
+  <h2>Слайд 41. «Kubernetes» — не один установщик</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out">Слово <strong>Kubernetes (K8s)</strong> — это <strong>стандарт и API</strong>: Pod, Deployment, Service, <code class="k8s-code">kubectl</code>, YAML — <strong>один язык</strong> для всех совместимых кластеров</li>
+<li class="fragment fade-in-then-semi-out">На практике вы ставите <strong>конкретную сборку</strong> (дистрибутив): <strong>kubeadm</strong>, <strong>облако</strong> (EKS, GKE, AKS), <strong>OpenShift</strong>, <strong>RKE</strong>, <strong>K3s</strong> и т.д. — как <strong>разные дистрибутивы Linux</strong>: ядро одно, <strong>упаковка</strong> разная</li>
+<li class="fragment fade-in-then-semi-out">Для разработчика важно: <strong>манифесты и команды</strong> в основном <strong>те же</strong>; отличаются <strong>установка, дефолты, сеть, размер</strong> кластера</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#0d1117" class="k8s-slide">
+  <h2>Слайд 42. Что такое K3s</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>K3s</strong> — <strong>лёгкий дистрибутив Kubernetes</strong> (проект Rancher / SUSE), <strong>не другой оркестратор</strong></li>
+<li class="fragment fade-in-then-semi-out">Цель: <strong>меньше ресурсов</strong>, <strong>проще старт</strong> на одной машине, <strong>edge</strong>, слабый VPS, учебные стенды</li>
+<li class="fragment fade-in-then-semi-out"><strong>Совместим с Kubernetes API</strong> (сертифицированная сборка): те же объекты, тот же <code class="k8s-code">kubectl</code></li>
+<li class="fragment fade-in-then-semi-out">Внутри могут быть <strong>другие дефолты</strong> (встроенные компоненты, хранилище состояния, CNI) — но <strong>модель</strong> та же</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="zoom" data-background-color="#111827" class="k8s-slide">
+  <h2>Слайд 43. K8s «полный» и K3s — на пальцах</h2>
+  <div class="k8s-slide-inner">
+<table class="k8s-table fragment">
+<tr>
+<th></th>
+<th><strong>Типичный «большой» K8s</strong></th>
+<th><strong>K3s</strong></th>
+</tr>
+<tr>
+<td><strong>Ресурсы</strong></td>
+<td>Обычно <strong>больше</strong> RAM/CPU на control plane</td>
+<td><strong>Меньше</strong>, проще на маленьком железе</td>
+</tr>
+<tr>
+<td><strong>Установка</strong></td>
+<td>Часто <strong>много шагов</strong> или managed в облаке</td>
+<td>Часто <strong>одна команда</strong>, быстрый старт</td>
+</tr>
+<tr>
+<td><strong>Где любят</strong></td>
+<td>Прод, много нод, команды платформы</td>
+<td>Edge, IoT, малые кластеры, «быстро поднять»</td>
+</tr>
+<tr>
+<td><strong>API и YAML</strong></td>
+<td>Стандарт</td>
+<td><strong>Тот же стандарт</strong></td>
+</tr>
+</table>
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out">Аналогия: <strong>полноразмерный автобус</strong> vs <strong>компактный фургон</strong> — <strong>правила дороги</strong> (API) <strong>одинаковые</strong></li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#0f172a" class="k8s-slide">
+  <h2>Слайд 44. Не путать: K3s, k3d, minikube, kind</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>K3s</strong> — <strong>реальный лёгкий Kubernetes</strong> на машине (или нескольких нодах)</li>
+<li class="fragment fade-in-then-semi-out"><strong>k3d</strong> — <strong>K3s внутри Docker</strong> (удобно локально: «кластер в контейнерах»)</li>
+<li class="fragment fade-in-then-semi-out"><strong>minikube</strong> — локальный кластер (часто одна нода), много документации для учебы</li>
+<li class="fragment fade-in-then-semi-out"><strong>kind</strong> — кластер <strong>в Docker</strong> (часто для CI и быстрых экспериментов)</li>
+</ul>
+<p class="fragment"><strong>Итог:</strong> это <strong>способы получить Kubernetes на столе</strong>, а не «K3s вместо K8s как другая платформа»</p>
+  </div>
+</section>
+
+<section data-transition="slide" data-background-color="#1e1b4b" class="k8s-slide">
+  <h2>Слайд 45. Когда что иметь в виду</h2>
+  <div class="k8s-slide-inner">
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out"><strong>Учёба / первая лаба на ноутбуке:</strong> чаще <strong>minikube</strong> или <strong>kind</strong> / <strong>k3d</strong> — по заданию преподавателя</li>
+<li class="fragment fade-in-then-semi-out"><strong>Один слабый VPS, мало памяти:</strong> смотрят <strong>K3s</strong> или <strong>k3d</strong></li>
+<li class="fragment fade-in-then-semi-out"><strong>Прод в компании / облако:</strong> обычно <strong>полный K8s</strong> или <strong>managed</strong> (EKS, GKE, AKS) — K3s там тоже бывает, но это <strong>выбор платформы</strong>, не экзамен по «правильному K8s»</li>
+</ul>
+  </div>
+</section>
+
+<section data-transition="fade" data-background-color="#0c4a6e" class="k8s-slide">
+  <h2>Слайд 46. Почему k3d — 🔥 для практических занятий</h2>
+  <div class="k8s-slide-inner">
+<p class="fragment"><strong class="k8s-lead">Сравнение вариантов для учебной аудитории:</strong></p>
+<table class="k8s-table fragment">
+<tr>
+<th>Критерий</th>
+<th>Docker Desktop K8s</th>
+<th>k3s</th>
+<th>k3d</th>
+</tr>
+<tr>
+<td>Платформа</td>
+<td>Win / macOS / Linux</td>
+<td>Linux</td>
+<td>Win / macOS / Linux</td>
+</tr>
+<tr>
+<td>Сложность</td>
+<td>очень низкая</td>
+<td>средняя</td>
+<td>низкая</td>
+</tr>
+<tr>
+<td>Похожесть на прод</td>
+<td>⭐⭐</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>Работа с образами</td>
+<td>локально</td>
+<td>через registry</td>
+<td>локально</td>
+</tr>
+<tr>
+<td>Мульти-нода</td>
+<td>❌</td>
+<td>⚠️ сложно</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Скорость старта</td>
+<td>средняя</td>
+<td>медленная</td>
+<td>быстрая</td>
+</tr>
+</table>
+<p class="fragment">📌 <strong>Идеальный мост:</strong> Docker Desktop → <strong>k3d</strong> → <strong>k3s</strong> → <strong>managed Kubernetes</strong></p>
+<p class="fragment">*На занятиях k3d часто удобен: <strong>один Docker</strong>, <strong>быстрый</strong> подъём кластера, <strong>локальные образы</strong> без публикации в registry, возможность <strong>нескольких нод</strong> для демонстрации.*</p>
+  </div>
+</section>
+
+<section data-transition="convex" data-background-color="#134e4a" class="k8s-slide">
+  <h2>Слайд 47. Kubernetes как контрольный автомат</h2>
+  <div class="k8s-slide-inner">
+<p class="fragment"><strong class="k8s-lead">Табличное задание (для отчёта):</strong></p>
+<table class="k8s-table fragment">
+<tr>
+<th>Сценарий</th>
+<th>Docker run</th>
+<th>Kubernetes</th>
+</tr>
+<tr>
+<td>Контейнер упал</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Масштабирование</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Rolling update</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Rollback</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>Конфигурация без пересборки</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</table>
+<p class="fragment">🔹 <strong>Финальное задание (капстоун)</strong></p>
+<p class="fragment"><strong class="k8s-lead">Итоговый кейс:</strong></p>
+<p class="fragment">«У вас сервис, который должен:</p>
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out">масштабироваться,</li>
+<li class="fragment fade-in-then-semi-out">переживать падения,</li>
+<li class="fragment fade-in-then-semi-out">обновляться без простоя,</li>
+<li class="fragment fade-in-then-semi-out">не хранить конфигурацию в коде.»</li>
+</ul>
+<p class="fragment"><strong class="k8s-lead">Требования:</strong></p>
+<ul class="k8s-ul">
+<li class="fragment fade-in-then-semi-out">Deployment (&gt;=2 реплики)</li>
+<li class="fragment fade-in-then-semi-out">Service</li>
+<li class="fragment fade-in-then-semi-out">ConfigMap</li>
+<li class="fragment fade-in-then-semi-out">probes</li>
+<li class="fragment fade-in-then-semi-out">resource limits</li>
+<li class="fragment fade-in-then-semi-out">rollout + rollback</li>
+</ul>
+  </div>
+</section>
+
+</div></div>
+<script src="../../../SEMESTR-1/15-16/js/reveal.min.js"></script>
+<script src="../../../SEMESTR-1/15-16/js/notes.min.js"></script>
+<script src="../../../SEMESTR-1/15-16/js/markdown.min.js"></script>
+<script src="../../../SEMESTR-1/15-16/js/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: 'dark',
+    securityLevel: 'loose',
+    fontFamily: 'trebuchet ms, verdana, sans-serif'
+  });
+
+  Reveal.initialize({
+    hash: true,
+    transition: 'slide',
+    transitionSpeed: 'default',
+    backgroundTransition: 'fade',
+    controls: true,
+    progress: true,
+    slideNumber: 'c/t',
+    center: true,
+    margin: 0.04,
+    fragments: true,
+    plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+  });
+
+  async function runMermaidOnSlide(slide) {
+    if (!slide) return;
+    var nodes = slide.querySelectorAll('.mermaid:not([data-processed])');
+    for (var i = 0; i < nodes.length; i++) {
+      try {
+        await mermaid.run({ nodes: [nodes[i]] });
+        nodes[i].setAttribute('data-processed', 'true');
+      } catch (e) { console.warn(e); }
+    }
+  }
+
+  Reveal.on('ready', function() {
+    runMermaidOnSlide(Reveal.getCurrentSlide());
+  });
+  Reveal.on('slidechanged', function(e) {
+    runMermaidOnSlide(e.currentSlide);
+  });
+</script>
+</body>
+</html>
