@@ -20,6 +20,7 @@ class User(AbstractUser):
     about_text = models.TextField(verbose_name="О себе",default="",blank=True)
     img = models.ImageField(verbose_name='Фото профиля',upload_to='image/user_image',blank=True,null=True)
     faculty = TreeForeignKey('myplatform.Faculty', on_delete=models.CASCADE, null=True, blank=True)
+    course = models.ForeignKey('myplatform.Course', on_delete=models.CASCADE, null=True,blank=True)
     def save(self, *args, **kwargs):
         if self.role == 'ADMIN':
             self.is_staff = True
@@ -105,5 +106,10 @@ class Faculty(MPTTModel):
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return f"{self.name}"    
+
+class Course(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Курс")
     def __str__(self):
         return f"{self.name}"

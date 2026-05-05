@@ -4,20 +4,21 @@ from .models import User
 from .models import Community
 from .models import Event
 from .models import Faculty
+from .models import Course
 from django.utils.html import mark_safe
 from mptt.admin import DraggableMPTTAdmin
 class CustomUserAdmin(UserAdmin):
     model = User
-    list_display = ['username','last_name','email','is_staff','is_active','role','image_preview','faculty','name','last_name_student','middle_name_student','about_text','birth_date']
-    list_filter = ['is_staff','is_active','role','faculty']
+    list_display = ['username','last_name','email','is_staff','is_active','role','image_preview','faculty','course','name','last_name_student','middle_name_student','about_text','birth_date']
+    list_filter = ['is_staff','is_active','role','faculty','course']
     fieldsets = UserAdmin.fieldsets+(
         ('Custom Fields', {
-            'fields': ('role','img','name','last_name_student','middle_name_student','birth_date','faculty','about_text')
+            'fields': ('role','img','name','last_name_student','middle_name_student','birth_date','faculty','course','about_text')
         }),
     )
     add_fieldsets = UserAdmin.add_fieldsets+(
         ('Custom Fields', {
-            'fields':('role','img','name','last_name_student','middle_name_student','birth_date','faculty','about_text')
+            'fields':('role','img','name','last_name_student','middle_name_student','birth_date','faculty','course','about_text')
         }),
     )
     def get_form(self, request, obj=None, **kwargs):
@@ -61,9 +62,14 @@ class FacultyAdmin(DraggableMPTTAdmin):
         if obj.img:
             return mark_safe(f'<img src="{obj.img.url}" width="50" height="50" />')
         return "Нет изображения"
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    list_filter = ['name']
+    ordering = ['id']
 
 admin.site.register(User, CustomUserAdmin)
 admin.site.register(Community,CommunityAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Faculty, FacultyAdmin)
+admin.site.register(Course, CourseAdmin)
 

@@ -11,6 +11,7 @@ from .models import Event
 from .models import Community
 from .models import Faculty
 from .models import User
+from .models import Course
 from events_parser.models import ParsedEvent
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -245,6 +246,8 @@ def profile(request):
 
 
 def register(request):
+    courses = Course.objects.all().order_by('id')
+    faculties = Faculty.objects.all()
     if request.method == 'POST':
         # Получаем данные
         username = request.POST.get('username')
@@ -281,7 +284,7 @@ def register(request):
         messages.success(request, "Регистрация прошла успешно! Теперь вы можете войти.")
         return redirect('login')
 
-    return render(request, 'registration/register.html')
+    return render(request, 'registration/register.html',{'courses': courses,'faculties': faculties})
 
 def activeratingpoints(request):
     return render(request,'registration/activeratingpoints.html')
