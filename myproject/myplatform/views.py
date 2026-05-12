@@ -249,11 +249,11 @@ def register(request):
     courses = Course.objects.all().order_by('id')
     faculties = Faculty.objects.all()
     if request.method == 'POST':
-        # Получаем данные
         username = request.POST.get('username')
         password = request.POST.get('password')
         role = request.POST.get('role')
-
+        course_id = request.POST.get('course')        
+        faculty_id = request.POST.get('faculty')
         first_name = request.POST.get('name')
         last_name = request.POST.get('last_name_student')
         middle_name = request.POST.get('middle_name_student')
@@ -264,10 +264,18 @@ def register(request):
         if User.objects.filter(username=username).exists():
             messages.error(request, "Этот никнейм уже занят.")
             return render(request, 'register.html')
-
+        course = None        
+        faculty = None        
+        if course_id:            
+            course = Course.objects.get(id=course_id)        
+        if faculty_id:            
+            faculty = Faculty.objects.get(id=faculty_id)
+    
         user = User(
             username=username,
             role=role,
+            course=course,
+            faculty=faculty,
             name=first_name,
             last_name_student=last_name,
             middle_name_student=middle_name,

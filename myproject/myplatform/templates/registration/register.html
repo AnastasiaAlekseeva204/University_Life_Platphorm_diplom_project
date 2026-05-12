@@ -19,17 +19,34 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label fw-bold">Кто вы?</label>
-                                <select name="role" class="form-select" required>
+                                <select name="role" class="form-select role_select" required>
                                     <option value="STUDENT">Студент</option>
                                     <option value="ORGANIZER">Организатор сообществ</option>
                                     <option value="ADMIN">Администратор</option>
                                 </select>
                             </div>
                         </div>
-                        <div style="display: none;">
-                            {{courses}}
-                            <br>
-                            {{faculties}}
+                        <div style="display: none;" class="role_cours">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Факультет</label>
+                                        <select name="faculty" class="form-select">
+                                            <option value="">Выберите факультет</option>
+                                            {% for faculty in faculties %}
+                                                <option value="{{ faculty.id }}">{{faculty.name}}</option>
+                                            {% endfor %}    
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Курс</label>
+                                        <select name="course" class="form-select">
+                                            <option value="">Выберите курс</option>
+                                            {% for course in courses %}
+                                                <option value="{{ course.id }}">{{course.name}}</option>
+                                            {%  endfor %}
+                                        </select>
+                                    </div>
+                            </div>
                         </div>
 
                         <div class="mb-3">
