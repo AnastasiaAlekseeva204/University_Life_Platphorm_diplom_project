@@ -46,8 +46,66 @@ def _presa_strip_noise(body: str) -> str:
         lines_out.append(line)
     return "\n".join(lines_out)
 
-
 def load_presa_slides():
+    """Парсинг dipoma/presa.md: слайды по строкам «### Слайд N. …»."""
+    if not PRES_PATH.is_file():
+        return []
+    
+    raw = PRES_PATH.read_text(encoding="utf-8")
+    # Разделяем по заголовкам слайдов, сохраняя их в результат
+    parts = re.split(r"(?m)^(###\s+Слайд\s+\d+\..+)$", raw)
+    slides = []
+    
+    for i in range(1, len(parts), 2):
+        if i + 1 >= len(parts):
+            break
+        
+        title_line = parts[i].strip()
+        body = _presa_strip_noise(parts[i + 1])
+        
+        # Извлекаем заголовок слайда
+        heading = re.sub(r"^#+\s*", "", title_line).strip()
+        heading = re.sub(r"^Слайд\s+\d+\.\s*", "", heading, flags=re.IGNORECASE)
+        if heading == "Титульный":
+            heading = ""
+        
+        # --- НОВОЕ: извлекаем изображение из body ---
+        image_url = None
+        lines = body.splitlines()
+        clean_lines = []
+        
+        for line in lines:
+            # Ищем markdown-изображение ![alt](url)
+            img_match = re.match(r"!\[.*?\]\((.*?)\)", line.strip())
+            if img_match:
+                image_url = img_match.group(1)  # Берём URL изображения
+            else:
+                clean_lines.append(line)
+        
+        body = "\n".join(clean_lines)
+        
+        # Парсим bullet points и параграфы
+        bullets = []
+        paragraphs = []
+        for raw_line in body.splitlines():
+            s = raw_line.strip()
+            if not s:
+                continue
+            if s.startswith("- "):
+                bullets.append(_presa_inline_bold(s[2:].strip()))
+            else:
+                paragraphs.append(_presa_inline_bold(s))
+        
+        slides.append({
+            "heading": heading,
+            "bullets": bullets,
+            "paragraphs": paragraphs,
+            "image_url": image_url,  # НОВОЕ поле
+        })
+    
+    return slides
+
+def old_load_presa_slides():
     """Парсинг dipoma/presa.md: слайды по строкам «### Слайд N. …»."""
     if not PRES_PATH.is_file():
         return []
@@ -81,8 +139,24 @@ def load_presa_slides():
         })
     return slides
 
-
 def presentation(request):
+    slides = load_presa_slides()
+    
+    # Добавляем номер слайда для удобства в шаблоне
+    for idx, slide in enumerate(slides, start=1):
+        slide["number"] = idx
+        slide["has_image"] = bool(slide.get("image_url"))
+    
+    return render(
+        request,
+        "presentation_slides.html",
+        {
+            "slides": slides,
+            "total_slides": len(slides),
+        },
+    )
+
+def pld_presentation(request):
     slides = load_presa_slides()
     return render(
         request,
@@ -229,6 +303,13 @@ def profile(request):
             user.faculty_id = faculty_id
         else:
             user.faculty = None
+        
+        course_id = request.POST.get('course')
+        if course_id:
+            user.course_id = course_id
+        else:
+            user.course = None
+
         if request.FILES.get('img'):
             user.img = request.FILES['img']
         
@@ -236,12 +317,14 @@ def profile(request):
         messages.success(request, 'Профиль успешно обновлен')
         return redirect('profile')
     events = Event.objects.all()
+    #print(user.course.id)
     join_events = user.events_joined.all()
     total_rating_event = sum(event.rating for event in join_events)
     faculties = Faculty.objects.all()
+    courses = Course.objects.all()
     join_communitys = user.communities_joined.all()
     total_rating_community = sum(community.rating for community in join_communitys)
-    return render(request,'registration/profile.html',{'events':events, 'faculties': faculties, 'total_rating_event':total_rating_event,'total_rating_community':total_rating_community})
+    return render(request,'registration/profile.html',{'events':events, 'faculties': faculties, 'courses': courses, 'total_rating_event':total_rating_event,'total_rating_community':total_rating_community})
 
 
 
