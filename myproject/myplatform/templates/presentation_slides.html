@@ -11,9 +11,9 @@
       --bg1: #0f2744;
       --accent: #005bff;
       --accent-soft: rgba(0, 91, 255, 0.35);
-      --text: #e8f0ff;
-      --muted: #9db3d9;
-      --card: rgba(255, 255, 255, 0.06);
+      --text: #000000;
+      --muted: #444;
+      --card: rgba(255, 255, 255, 1);
       --border: rgba(255, 255, 255, 0.12);
       /* было 920px; +30 % ≈ 1196px */
       --slide-max-width: min(1196px, 100%);
@@ -24,7 +24,8 @@
       min-height: 100%;
       font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       color: var(--text);
-      background: linear-gradient(145deg, var(--bg0), var(--bg1) 45%, #0a1e3d);
+      background-color: #d4ddea;
+      /*background: linear-gradient(145deg, var(--bg0), var(--bg1) 45%, #0a1e3d);*/
     }
     /* Фон: «нейросеть» (узлы + рёбра), как на типичных tech-лендингах */
     .neuron-bg {
@@ -44,7 +45,7 @@
       text-decoration: none;
       font-size: 1.05rem;
     }
-    a.home-link:hover { color: #fff; }
+    a.home-link:hover { color: #000; }
     .deck {
       position: relative;
       z-index: 1;
@@ -69,8 +70,8 @@
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: clamp(1.9rem, 5.5vw, 3.35rem);
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(10px);
+      /*box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);*/
+      /*backdrop-filter: blur(10px);*/
     }
     .slide h1 {
       margin: 0 0 0.65rem;
@@ -104,7 +105,8 @@
       align-items: center;
       justify-content: center;
       gap: 0.65rem;
-      background: linear-gradient(180deg, transparent, rgba(5, 12, 28, 0.92));
+      background: #cfe2ff;
+      /*background: linear-gradient(180deg, transparent, rgba(5, 12, 28, 0.92));*/
       z-index: 20;
     }
     .toolbar button {
@@ -121,12 +123,12 @@
       filter: brightness(1.06);
     }
     .toolbar button:disabled {
-      opacity: 0.4;
+      opacity: 1;
       cursor: not-allowed;
     }
-    .btn-prev { background: #dfe8ff; color: #0a1b3f; }
+    .btn-prev { background: #f9f3bf; color: #0a1b3f; }
     .btn-next { background: var(--accent); color: #fff; }
-    .btn-fs { background: rgba(255,255,255,0.12); color: #fff; }
+    .btn-fs {  color: #222; }
     .counter {
       min-width: 5.5rem;
       text-align: center;
@@ -145,14 +147,15 @@
       position: relative;
       overflow: hidden;
       text-align: center;
-      background:
+      background: white;
+      /*background:
         radial-gradient(ellipse 120% 80% at 50% -20%, rgba(0, 91, 255, 0.28), transparent 55%),
         radial-gradient(circle at 90% 80%, rgba(0, 212, 255, 0.12), transparent 40%),
-        linear-gradient(165deg, rgba(255, 255, 255, 0.09), rgba(5, 20, 45, 0.55));
+        linear-gradient(165deg, rgba(255, 255, 255, 0.09), rgba(5, 20, 45, 0.55));*/
       border: 1px solid rgba(126, 184, 255, 0.35);
-      box-shadow:
+      /*box-shadow:
         0 0 0 1px rgba(0, 91, 255, 0.15) inset,
-        0 24px 80px rgba(0, 40, 120, 0.45);
+        0 24px 80px rgba(0, 40, 120, 0.45);*/
       animation: heroCardPulse 8s ease-in-out infinite;
     }
     .slide-card--hero::before {
@@ -173,8 +176,8 @@
       opacity: 0.75;
     }
     @keyframes heroCardPulse {
-      0%, 100% { box-shadow: 0 0 0 1px rgba(0, 91, 255, 0.12) inset, 0 24px 80px rgba(0, 40, 120, 0.45); }
-      50% { box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.22) inset, 0 28px 90px rgba(0, 60, 140, 0.55); }
+      /*0%, 100% { box-shadow: 0 0 0 1px rgba(0, 91, 255, 0.12) inset, 0 24px 80px rgba(0, 40, 120, 0.45); }
+      50% { box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.22) inset, 0 28px 90px rgba(0, 60, 140, 0.55); }*/
     }
     @keyframes heroMesh {
       0%, 100% { opacity: 0.55; }
@@ -193,28 +196,28 @@
       font-weight: 700;
       line-height: 1.35;
       letter-spacing: -0.02em;
-      background: linear-gradient(105deg, #fff 0%, #c5ddff 45%, #5eb8ff 85%, #00d4aa 100%);
+      /*background: linear-gradient(105deg, #fff 0%, #c5ddff 45%, #5eb8ff 85%, #00d4aa 100%);*/
       -webkit-background-clip: text;
       background-clip: text;
-      color: transparent;
-      filter: drop-shadow(0 2px 24px rgba(0, 91, 255, 0.35));
+      color: #333;
+      /*filter: drop-shadow(0 2px 24px rgba(31, 30, 30, 0.35));*/
     }
     .title-theme strong {
-      color: #fff;
+      color: #222;
       font-weight: 800;
-      text-shadow: 0 0 28px rgba(0, 91, 255, 0.55);
+      /*text-shadow: 0 0 28px rgba(0, 91, 255, 0.55);*/
     }
     .title-line {
-      margin: 0 auto 0.75rem;
-      max-width: 38rem;
-      padding: 0.65rem 1.1rem 0.65rem 1.25rem;
-      text-align: left;
-      font-size: clamp(1.05rem, 2.5vw, 1.38rem);
-      color: var(--muted);
-      border-left: 4px solid var(--accent);
-      background: rgba(0, 0, 0, 0.18);
-      border-radius: 0 12px 12px 0;
-      line-height: 1.45;
+        margin: 0 auto 0.75rem;
+        max-width: 38rem;
+        padding: 0.65rem 1.1rem 0.65rem 1.25rem;
+        text-align: left;
+        font-size: clamp(1.05rem, 2.5vw, 1.38rem);
+        color: #222;
+        border-left: 4px solid var(--accent);
+        background: #cfe2ff;
+        border-radius: 0 12px 12px 0;
+        line-height: 1.45;
     }
     .title-line strong { color: #e8f0ff; }
     .title-foot {
@@ -224,13 +227,12 @@
       margin-top: 1.65rem;
       padding: 0.58rem 1.5rem;
       font-size: clamp(1.1rem, 2.75vw, 1.4rem);
-      font-weight: 800;
+      /*font-weight: 800;*/
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: #fff;
-      border-radius: 999px;
+      border-radius: 10px;
       background: linear-gradient(90deg, #005bff, #0a6cff 50%, #00a8cc);
-      box-shadow: 0 8px 28px rgba(0, 91, 255, 0.45);
     }
       /* Стили для изображений на слайдах */
     .slide-image-wrapper {
@@ -280,7 +282,7 @@
     }
   </style>
 </head>
-<body>
+<body> 
   <canvas id="neuronBg" class="neuron-bg" width="300" height="150" aria-hidden="true"></canvas>
   <a class="home-link" href="{% url 'index' %}">← На главную</a>
 
