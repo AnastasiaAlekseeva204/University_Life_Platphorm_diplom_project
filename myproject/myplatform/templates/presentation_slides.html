@@ -68,32 +68,60 @@
     .slide-card {
       background: var(--card);
       border: 1px solid var(--border);
+      border-radius: 24px; /* Более мягкие углы */
+      padding: 3.5rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      /*background: var(--card);
+      border: 1px solid var(--border);
       border-radius: 20px;
-      padding: clamp(1.9rem, 5.5vw, 3.35rem);
+      padding: clamp(1.9rem, 5.5vw, 3.35rem);*/
       /*box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);*/
       /*backdrop-filter: blur(10px);*/
     }
     .slide h1 {
+      margin-bottom: 1.5rem;
+      color: var(--bg0); /* Используем ваш темный цвет для заголовка */
+      text-transform: uppercase;
+      letter-spacing: -0.01em;
+    }
+
+    .slide li {
+      margin-bottom: 1.2rem;
+      padding-left: 0.5rem;
+    }
+
+    /* Красивые маркеры списка в стиле tech */
+    .slide ul {
+      list-style: none; /* Убираем стандартные точки */
+    }
+
+    .slide ul li::before {
+      content: "—";
+      color: var(--accent);
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    /*.slide h1 {
       margin: 0 0 0.65rem;
       font-size: clamp(1.55rem, 5.2vw, 2.85rem);
       font-weight: 700;
       line-height: 1.25;
-    }
+    }*/
     .slide p {
       margin: 0.55rem 0;
       line-height: 1.58;
       color: var(--text);
       font-size: clamp(1.05rem, 2.85vw, 1.65rem);
     }
-    .slide ul {
+    /*.slide ul {
       margin: 0.85rem 0 0;
       padding-left: 1.45rem;
       line-height: 1.58;
       font-size: clamp(1.05rem, 2.85vw, 1.65rem);
       color: var(--muted);
-    }
-    .slide li { margin-bottom: 0.7rem; }
-    .slide li strong, .slide p strong { color: #fff; }
+    }*/
+    /*.slide li { margin-bottom: 0.7rem; }*/
+    .slide li strong, .slide p strong { color: #000000; }
     .toolbar {
       position: fixed;
       left: 0;
@@ -110,6 +138,17 @@
       z-index: 20;
     }
     .toolbar button {
+      background: var(--bg1); /* Темно-синий фон кнопок */
+      color: #fff;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 0.8rem 1.5rem;
+    }
+
+    .btn-next {
+      background: var(--accent); /* Яркий акцент для кнопки "Следующий" */
+    }
+    /*.toolbar button {
       border: none;
       border-radius: 12px;
       padding: 0.72rem 1.25rem;
@@ -117,7 +156,7 @@
       font-weight: 600;
       cursor: pointer;
       transition: transform 0.15s ease, filter 0.15s ease;
-    }
+    }*/
     .toolbar button:hover:not(:disabled) {
       transform: translateY(-1px);
       filter: brightness(1.06);
@@ -127,7 +166,7 @@
       cursor: not-allowed;
     }
     .btn-prev { background: #f9f3bf; color: #0a1b3f; }
-    .btn-next { background: var(--accent); color: #fff; }
+    /*.btn-next { background: var(--accent); color: #fff; }*/
     .btn-fs {  color: #222; }
     .counter {
       min-width: 5.5rem;
@@ -183,6 +222,11 @@
       0%, 100% { opacity: 0.55; }
       50% { opacity: 0.88; }
     }
+    .title-theme {
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
     .title-slide {
       position: relative;
       z-index: 1;
@@ -190,18 +234,18 @@
       margin: 0 auto;
       padding-top: 0.35rem;
     }
-    .title-theme {
+    /*.title-theme {
       margin: 0 0 1.75rem;
       font-size: clamp(1.35rem, 3.8vw, 2.05rem);
       font-weight: 700;
       line-height: 1.35;
       letter-spacing: -0.02em;
-      /*background: linear-gradient(105deg, #fff 0%, #c5ddff 45%, #5eb8ff 85%, #00d4aa 100%);*/
+      background: linear-gradient(105deg, #fff 0%, #c5ddff 45%, #5eb8ff 85%, #00d4aa 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: #333;
-      /*filter: drop-shadow(0 2px 24px rgba(31, 30, 30, 0.35));*/
-    }
+      filter: drop-shadow(0 2px 24px rgba(31, 30, 30, 0.35));
+    }*/
     .title-theme strong {
       color: #222;
       font-weight: 800;
