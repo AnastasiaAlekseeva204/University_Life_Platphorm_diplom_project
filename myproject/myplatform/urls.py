@@ -10,6 +10,7 @@ urlpatterns = [
     path('communities',views.communities, name='communities'),
     path('aboutus', views.aboutus,name='aboutus'),
     path('presentation', views.presentation, name='presentation'),
+    path('presa_video', views.presa_video, name='presa_video'),
     path('communities/<int:community_id>/', views.community_detail, name='community_detail'),
     path('events/<int:event_id>/',views.event_detail, name='event_detail'),
     path('register',views.register,name='register'),

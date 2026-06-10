@@ -10,6 +10,7 @@
     :root {
       --bg0: #0a1628;
       --bg1: #0f2744;
+      --bg2:  #bd472a;
       --accent: #005bff;
       --accent-soft: rgba(0, 91, 255, 0.35);
       --text: #000000;
@@ -147,6 +148,14 @@
       border: 1px solid rgba(255,255,255,0.1);
       padding: 0.8rem 1.5rem;
     }
+    .toolbar a {
+      background: var(--bg2);
+      color: #fff;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 0.8rem 1.5rem;
+      text-decoration: none;
+    }
 
     .btn-next {
       background: var(--accent); /* Яркий акцент для кнопки "Следующий" */
@@ -168,6 +177,7 @@
       opacity: 1;
       cursor: not-allowed;
     }
+
     .btn-prev { background: #f9f3bf; color: #0a1b3f; }
     /*.btn-next { background: var(--accent); color: #fff; }*/
     .btn-fs {  color: #222; }
@@ -386,6 +396,7 @@
 
   {% if slides %}
   <div class="toolbar">
+    <a href="presa_video" class="btn-prev btn-video">Краткий видеобзор</a>
     <button type="button" class="btn-prev" id="btnPrev">Предыдущий</button>
     <span class="counter" id="counter">1 / {{ total_slides }}</span>
     <button type="button" class="btn-next" id="btnNext">Следующий</button>

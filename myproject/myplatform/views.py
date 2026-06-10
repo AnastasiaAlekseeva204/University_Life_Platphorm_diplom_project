@@ -155,6 +155,9 @@ def presentation(request):
             "total_slides": len(slides),
         },
     )
+def presa_video(request):
+    return render(request,"presa_video.html")
+
 
 def pld_presentation(request):
     slides = load_presa_slides()
